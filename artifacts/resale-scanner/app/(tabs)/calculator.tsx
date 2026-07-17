@@ -17,21 +17,27 @@ import { useColors } from '@/hooks/useColors';
 import { useSettings } from '@/context/SettingsContext';
 import { useScan } from '@/context/ScanContext';
 
-type Condition = 'fair' | 'good' | 'like_new';
+type Condition = 'poor' | 'fair' | 'good' | 'like_new' | 'free';
 
 const CONDITION_MULTIPLIERS: Record<Condition, number> = {
+  free: 0,
+  poor: 0.5,
   fair: 0.7,
   good: 0.85,
   like_new: 0.95,
 };
 
 const CONDITION_LABELS: Record<Condition, string> = {
+  free: 'Free',
+  poor: 'Poor',
   fair: 'Fair',
   good: 'Good',
   like_new: 'Like New',
 };
 
 const CONDITION_HINTS: Record<Condition, string> = {
+  free: 'Not for resale',
+  poor: '50% of market',
   fair: '70% of market',
   good: '85% of market',
   like_new: '95% of market',
@@ -156,8 +162,9 @@ export default function CalculatorScreen() {
             {/* Condition */}
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>Item Condition</Text>
+              {/* Top row: Poor / Fair / Good / Like New */}
               <View style={styles.conditionRow}>
-                {(['fair', 'good', 'like_new'] as Condition[]).map((c) => (
+                {(['poor', 'fair', 'good', 'like_new'] as Condition[]).map((c) => (
                   <TouchableOpacity
                     key={c}
                     style={[
@@ -186,6 +193,22 @@ export default function CalculatorScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
+              {/* Free — full-width warning chip */}
+              <TouchableOpacity
+                style={[
+                  styles.freeChip,
+                  condition === 'free' && styles.freeChipActive,
+                ]}
+                onPress={() => handleConditionSelect('free')}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.freeChipText, condition === 'free' && styles.freeChipTextActive]}>
+                  Free / Not for Resale
+                </Text>
+                <Text style={[styles.freeChipHint, condition === 'free' && styles.freeChipHintActive]}>
+                  Item has no resale value
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -225,34 +248,44 @@ export default function CalculatorScreen() {
         </View>
 
         {/* Net Profit Display */}
-        <View style={[styles.profitCard, { borderColor: profitColor + '44' }]}>
-          <View style={styles.profitHeader}>
-            <Feather
-              name={isProfitable ? 'trending-up' : 'trending-down'}
-              size={20}
-              color={profitColor}
-            />
-            <Text style={[styles.profitLabel, { color: profitColor }]}>
-              {isProfitable ? 'NET PROFIT' : 'NET LOSS'}
+        {condition === 'free' ? (
+          <View style={styles.noResaleCard}>
+            <Feather name="slash" size={28} color={colors.loss} />
+            <Text style={styles.noResaleTitle}>Not Suitable for Resale</Text>
+            <Text style={styles.noResaleBody}>
+              This item is in too poor a condition to generate a meaningful return. Consider donating it or disposing of it responsibly.
             </Text>
           </View>
-          <Text style={[styles.profitValue, { color: profitColor }]}>
-            {isProfitable ? '+' : ''}${netProfit.toFixed(2)}
-          </Text>
-          {purchasePrice > 0 && (
-            <View style={styles.roiRow}>
-              <Text style={styles.roiLabel}>ROI</Text>
-              <Text style={[styles.roiValue, { color: profitColor }]}>
-                {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
+        ) : (
+          <View style={[styles.profitCard, { borderColor: profitColor + '44' }]}>
+            <View style={styles.profitHeader}>
+              <Feather
+                name={isProfitable ? 'trending-up' : 'trending-down'}
+                size={20}
+                color={profitColor}
+              />
+              <Text style={[styles.profitLabel, { color: profitColor }]}>
+                {isProfitable ? 'NET PROFIT' : 'NET LOSS'}
               </Text>
             </View>
-          )}
-          {!analysis && (
-            <Text style={styles.profitNote}>
-              Scan an item above to get AI-powered price estimates
+            <Text style={[styles.profitValue, { color: profitColor }]}>
+              {isProfitable ? '+' : ''}${netProfit.toFixed(2)}
             </Text>
-          )}
-        </View>
+            {purchasePrice > 0 && (
+              <View style={styles.roiRow}>
+                <Text style={styles.roiLabel}>ROI</Text>
+                <Text style={[styles.roiValue, { color: profitColor }]}>
+                  {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
+                </Text>
+              </View>
+            )}
+            {!analysis && (
+              <Text style={styles.profitNote}>
+                Scan an item above to get AI-powered price estimates
+              </Text>
+            )}
+          </View>
+        )}
 
         {/* Settings Reminder */}
         <TouchableOpacity
@@ -346,12 +379,12 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       paddingVertical: 10,
     },
     divider: { height: 1, backgroundColor: colors.border },
-    conditionRow: { flexDirection: 'row', gap: 8 },
+    conditionRow: { flexDirection: 'row', gap: 6, marginBottom: 6 },
     conditionChip: {
       flex: 1,
       backgroundColor: colors.secondary,
       borderRadius: 8,
-      padding: 10,
+      padding: 8,
       alignItems: 'center',
       borderWidth: 1,
       borderColor: colors.border,
@@ -360,10 +393,52 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       backgroundColor: colors.primary + '22',
       borderColor: colors.primary,
     },
-    conditionChipText: { fontSize: 13, fontFamily: 'Inter_600SemiBold', color: colors.mutedForeground },
+    conditionChipText: { fontSize: 12, fontFamily: 'Inter_600SemiBold', color: colors.mutedForeground },
     conditionChipTextActive: { color: colors.primary },
-    conditionHint: { fontSize: 10, fontFamily: 'Inter_400Regular', color: colors.mutedForeground, marginTop: 2 },
+    conditionHint: { fontSize: 9, fontFamily: 'Inter_400Regular', color: colors.mutedForeground, marginTop: 2 },
     conditionHintActive: { color: colors.primary },
+    freeChip: {
+      backgroundColor: colors.secondary,
+      borderRadius: 8,
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    freeChipActive: {
+      backgroundColor: colors.loss + '18',
+      borderColor: colors.loss,
+    },
+    freeChipText: { fontSize: 13, fontFamily: 'Inter_600SemiBold', color: colors.mutedForeground },
+    freeChipTextActive: { color: colors.loss },
+    freeChipHint: { fontSize: 11, fontFamily: 'Inter_400Regular', color: colors.mutedForeground },
+    freeChipHintActive: { color: colors.loss },
+    noResaleCard: {
+      backgroundColor: colors.card,
+      borderRadius: colors.radius,
+      borderWidth: 2,
+      borderColor: colors.loss + '44',
+      padding: 24,
+      alignItems: 'center',
+      gap: 10,
+      marginBottom: 12,
+    },
+    noResaleTitle: {
+      fontSize: 18,
+      fontFamily: 'Inter_700Bold',
+      color: colors.loss,
+      textAlign: 'center',
+    },
+    noResaleBody: {
+      fontSize: 13,
+      fontFamily: 'Inter_400Regular',
+      color: colors.mutedForeground,
+      textAlign: 'center',
+      lineHeight: 19,
+    },
     breakdownRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
