@@ -16,6 +16,13 @@ export interface AnalyzeRequest {
   mimeType: string;
 }
 
+export interface ListingTemplate {
+  /** Search-optimised listing title (60-80 characters) */
+  title: string;
+  /** Ready-to-paste multi-paragraph listing description */
+  body: string;
+}
+
 export interface AnalyzeResult {
   itemName: string;
   category: string;
@@ -26,6 +33,7 @@ export interface AnalyzeResult {
   suggestedPlatforms: string[];
   /** Keyword tags optimised for resale listing titles and tag fields */
   listingTags: string[];
+  listingTemplate: ListingTemplate;
 }
 
 export interface ErrorResponse {

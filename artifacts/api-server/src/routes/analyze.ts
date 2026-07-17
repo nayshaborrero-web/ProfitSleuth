@@ -25,7 +25,11 @@ Return ONLY a valid JSON object with exactly these fields (no markdown, no extra
   "description": "2-3 sentences explaining what the item is, its condition (if visible), and why it has this resale value",
   "confidenceLevel": "one of: low, medium, high",
   "suggestedPlatforms": ["array", "of", "best", "platforms", "to sell on like eBay, Facebook Marketplace, Depop, StockX, etc"],
-  "listingTags": ["8 to 12 short keyword tags a seller should add to their listing title or tags field, e.g. brand name, model, colour, size, style, condition keywords, niche descriptors — optimised for searchability on resale platforms"]
+  "listingTags": ["8 to 12 short keyword tags a seller should add to their listing title or tags field, e.g. brand name, model, colour, size, style, condition keywords, niche descriptors — optimised for searchability on resale platforms"],
+  "listingTemplate": {
+    "title": "A punchy, search-optimised listing title of 60-80 characters including brand, item name, key feature, and condition",
+    "body": "A ready-to-paste listing description of 3-4 short paragraphs: (1) what the item is and standout features, (2) visible condition details and any flaws to be transparent, (3) what's included in the sale, (4) a brief seller assurance line about dispatch and packaging. Write in second-person seller voice, no markdown, plain text only."
+  }
 }
 
 Be specific and accurate. If the item is not clearly visible, set confidenceLevel to "low" and provide a wide price range.`;

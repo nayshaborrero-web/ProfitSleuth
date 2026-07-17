@@ -102,6 +102,8 @@ components:
           description: Keyword tags optimised for resale listing titles and tag fields
           items:
             type: string
+        listingTemplate:
+          $ref: "#/components/schemas/ListingTemplate"
       required:
         - itemName
         - category
@@ -111,6 +113,19 @@ components:
         - confidenceLevel
         - suggestedPlatforms
         - listingTags
+        - listingTemplate
+    ListingTemplate:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Search-optimised listing title (60-80 characters)
+        body:
+          type: string
+          description: Ready-to-paste multi-paragraph listing description
+      required:
+        - title
+        - body
     ErrorResponse:
       type: object
       properties:

@@ -10,3 +10,4 @@ export * from './analyzeRequest';
 export * from './analyzeResult';
 export * from './errorResponse';
 export * from './healthStatus';
+export * from './listingTemplate';

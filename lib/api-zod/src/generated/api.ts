@@ -34,7 +34,11 @@ export const AnalyzeItemImageResponse = zod.object({
   "description": zod.string(),
   "confidenceLevel": zod.string(),
   "suggestedPlatforms": zod.array(zod.string()),
-  "listingTags": zod.array(zod.string()).describe('Keyword tags optimised for resale listing titles and tag fields')
+  "listingTags": zod.array(zod.string()).describe('Keyword tags optimised for resale listing titles and tag fields'),
+  "listingTemplate": zod.object({
+  "title": zod.string().describe('Search-optimised listing title (60-80 characters)'),
+  "body": zod.string().describe('Ready-to-paste multi-paragraph listing description')
+})
 })
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -36,10 +37,20 @@ export default function ScannerScreen() {
   const [imageMime, setImageMime] = useState<string>('image/jpeg');
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [sizeError, setSizeError] = useState<string | null>(null);
+  const [draftTitle, setDraftTitle] = useState('');
+  const [draftBody, setDraftBody] = useState('');
 
   // ~10 MB of base64 ≈ 7.5 MB raw — stays safely under the 20 MB server
   // limit and Gemini's 8 MB inline-data limit.
   const MAX_BASE64_BYTES = 10_000_000;
+
+  // Sync editable template fields whenever a new result arrives
+  useEffect(() => {
+    if (result?.listingTemplate) {
+      setDraftTitle(result.listingTemplate.title ?? '');
+      setDraftBody(result.listingTemplate.body ?? '');
+    }
+  }, [result]);
 
   const analyzemutation = useAnalyzeItemImage({
     mutation: {
@@ -390,6 +401,76 @@ export default function ScannerScreen() {
             </View>
           )}
 
+          {result.listingTemplate && (
+            <View style={styles.templateSection}>
+              <View style={styles.templateHeader}>
+                <Text style={styles.templateLabel}>LISTING TEMPLATE</Text>
+                <TouchableOpacity
+                  style={styles.copyTagsButton}
+                  onPress={async () => {
+                    await Clipboard.setStringAsync(`${draftTitle}\n\n${draftBody}`);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    Alert.alert('Copied', 'Full listing copied to clipboard.');
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Feather name="copy" size={12} color={colors.primary} />
+                  <Text style={styles.copyTagsText}>Copy full</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Editable title */}
+              <View style={styles.templateFieldBlock}>
+                <View style={styles.templateFieldRow}>
+                  <Text style={styles.templateFieldLabel}>Title</Text>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await Clipboard.setStringAsync(draftTitle);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Feather name="copy" size={13} color={colors.mutedForeground} />
+                  </TouchableOpacity>
+                </View>
+                <TextInput
+                  style={styles.templateTitleInput}
+                  value={draftTitle}
+                  onChangeText={setDraftTitle}
+                  multiline={false}
+                  returnKeyType="done"
+                  placeholderTextColor={colors.mutedForeground}
+                />
+                <Text style={styles.templateCharCount}>{draftTitle.length} chars</Text>
+              </View>
+
+              {/* Editable body */}
+              <View style={styles.templateFieldBlock}>
+                <View style={styles.templateFieldRow}>
+                  <Text style={styles.templateFieldLabel}>Description</Text>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await Clipboard.setStringAsync(draftBody);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Feather name="copy" size={13} color={colors.mutedForeground} />
+                  </TouchableOpacity>
+                </View>
+                <TextInput
+                  style={styles.templateBodyInput}
+                  value={draftBody}
+                  onChangeText={setDraftBody}
+                  multiline
+                  textAlignVertical="top"
+                  placeholderTextColor={colors.mutedForeground}
+                />
+              </View>
+              <Text style={styles.tagsTip}>Tap any field to edit before copying</Text>
+            </View>
+          )}
+
           <View style={styles.resultActions}>
             <TouchableOpacity
               style={styles.rescanButton}
@@ -494,6 +575,64 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       fontSize: 15,
       fontFamily: 'Inter_600SemiBold',
       color: colors.primaryForeground,
+    },
+    templateSection: {
+      marginTop: 16,
+      gap: 10,
+    },
+    templateHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    templateLabel: {
+      fontSize: 11,
+      fontFamily: 'Inter_600SemiBold',
+      color: colors.mutedForeground,
+      letterSpacing: 0.8,
+    },
+    templateFieldBlock: {
+      gap: 6,
+    },
+    templateFieldRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    templateFieldLabel: {
+      fontSize: 11,
+      fontFamily: 'Inter_500Medium',
+      color: colors.mutedForeground,
+    },
+    templateTitleInput: {
+      backgroundColor: colors.secondary,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 13,
+      fontFamily: 'Inter_500Medium',
+      color: colors.foreground,
+    },
+    templateCharCount: {
+      fontSize: 10,
+      fontFamily: 'Inter_400Regular',
+      color: colors.mutedForeground,
+      textAlign: 'right',
+    },
+    templateBodyInput: {
+      backgroundColor: colors.secondary,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 13,
+      fontFamily: 'Inter_400Regular',
+      color: colors.foreground,
+      minHeight: 180,
+      lineHeight: 20,
     },
     tagsSection: {
       marginTop: 16,

@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { ListingTemplate } from './listingTemplate';
 
 export interface AnalyzeResult {
   itemName: string;
@@ -16,4 +17,5 @@ export interface AnalyzeResult {
   suggestedPlatforms: string[];
   /** Keyword tags optimised for resale listing titles and tag fields */
   listingTags: string[];
+  listingTemplate: ListingTemplate;
 }
