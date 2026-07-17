@@ -111,21 +111,8 @@ export default function ScannerScreen() {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const pasteFromClipboard = async () => {
-    const hasImage = await Clipboard.hasImageAsync();
-    if (!hasImage) {
-      Alert.alert('No Image on Clipboard', 'Copy an image first, then use Paste to scan it.');
-      return;
-    }
-
-    const clipResult = await Clipboard.getImageAsync({ format: 'jpeg' });
-    if (!clipResult?.data) {
-      Alert.alert('Paste Failed', 'Could not read the image from clipboard. Try again.');
-      return;
-    }
-
-    const b64 = clipResult.data;
-
+  // Shared: validate size and apply an image from any source
+  const applyBase64Image = (b64: string, mime: string) => {
     setResult(null);
     setSizeError(null);
 
@@ -134,16 +121,77 @@ export default function ScannerScreen() {
       setSizeError(
         `This image is too large (${sizeMB} MB encoded). Please use an image under 7.5 MB — try cropping it, lowering your camera resolution, or picking a smaller photo.`
       );
-      setImageUri(`data:image/jpeg;base64,${b64.slice(0, 200)}`);
+      setImageUri(null);
       setImageBase64(null);
       return;
     }
 
-    setImageUri(`data:image/jpeg;base64,${b64}`);
+    setImageUri(`data:${mime};base64,${b64}`);
     setImageBase64(b64);
-    setImageMime('image/jpeg');
+    setImageMime(mime);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  const pasteFromClipboard = async () => {
+    if (Platform.OS === 'web') {
+      // Web: expo-clipboard doesn't support images — use the browser Clipboard API directly
+      try {
+        const cb = (navigator as any).clipboard;
+        if (typeof cb?.read !== 'function') {
+          Alert.alert(
+            'Not Supported',
+            'Your browser does not support clipboard image reading. Use Camera or Gallery instead.'
+          );
+          return;
+        }
+
+        const items: ClipboardItem[] = await cb.read();
+        let b64: string | null = null;
+        let mime = 'image/png';
+
+        for (const item of items) {
+          for (const type of item.types) {
+            if (type.startsWith('image/')) {
+              const blob = await item.getType(type);
+              b64 = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve((reader.result as string).split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              });
+              mime = type;
+              break;
+            }
+          }
+          if (b64) break;
+        }
+
+        if (!b64) {
+          Alert.alert('No Image on Clipboard', 'Copy an image first, then tap Paste to scan it.');
+          return;
+        }
+
+        applyBase64Image(b64, mime);
+      } catch {
+        Alert.alert(
+          'Clipboard Access Denied',
+          'Allow clipboard access in your browser (look for the clipboard icon in the address bar), then try again.'
+        );
+      }
+    } else {
+      // Native: use expo-clipboard
+      const hasImage = await Clipboard.hasImageAsync();
+      if (!hasImage) {
+        Alert.alert('No Image on Clipboard', 'Copy an image first, then tap Paste to scan it.');
+        return;
+      }
+      const clipResult = await Clipboard.getImageAsync({ format: 'jpeg' });
+      if (!clipResult?.data) {
+        Alert.alert('Paste Failed', 'Could not read the image from clipboard. Try again.');
+        return;
+      }
+      applyBase64Image(clipResult.data, 'image/jpeg');
+    }
   };
 
   const handleAnalyze = () => {
