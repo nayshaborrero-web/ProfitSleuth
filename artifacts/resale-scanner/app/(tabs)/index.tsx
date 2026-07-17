@@ -34,6 +34,11 @@ export default function ScannerScreen() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [imageMime, setImageMime] = useState<string>('image/jpeg');
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [sizeError, setSizeError] = useState<string | null>(null);
+
+  // ~10 MB of base64 ≈ 7.5 MB raw — stays safely under the 20 MB server
+  // limit and Gemini's 8 MB inline-data limit.
+  const MAX_BASE64_BYTES = 10_000_000;
 
   const analyzemutation = useAnalyzeItemImage({
     mutation: {
@@ -79,9 +84,25 @@ export default function ScannerScreen() {
     if (result.canceled || !result.assets[0]) return;
 
     const asset = result.assets[0];
-    setImageUri(asset.uri);
-    setImageBase64(asset.base64 ?? null);
+    const b64 = asset.base64 ?? null;
+
+    // Clear previous state
     setResult(null);
+    setSizeError(null);
+
+    // Check size before accepting the image
+    if (b64 && b64.length > MAX_BASE64_BYTES) {
+      const sizeMB = (b64.length / 1_000_000).toFixed(1);
+      setSizeError(
+        `This image is too large (${sizeMB} MB encoded). Please use an image under 7.5 MB — try cropping it, lowering your camera resolution, or picking a smaller photo.`
+      );
+      setImageUri(asset.uri);   // still show the preview so the user can see which image
+      setImageBase64(null);     // but block analysis
+      return;
+    }
+
+    setImageUri(asset.uri);
+    setImageBase64(b64);
 
     const mime = asset.mimeType ?? 'image/jpeg';
     setImageMime(mime);
@@ -164,8 +185,22 @@ export default function ScannerScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Size Error Disclaimer */}
+      {sizeError && (
+        <View style={styles.sizeErrorCard}>
+          <Feather name="alert-triangle" size={18} color={styles.sizeErrorTitle.color} />
+          <View style={{ flex: 1, gap: 4 }}>
+            <Text style={styles.sizeErrorTitle}>Image Too Large</Text>
+            <Text style={styles.sizeErrorBody}>{sizeError}</Text>
+            <Text style={styles.sizeErrorHint}>
+              Accepted: up to 7.5 MB · JPEG or PNG · Tip: use the crop tool or reduce camera resolution.
+            </Text>
+          </View>
+        </View>
+      )}
+
       {/* Analyze Button */}
-      {imageUri && !result && (
+      {imageUri && !result && !sizeError && (
         <TouchableOpacity
           style={[styles.analyzeButton, analyzemutation.isPending && styles.analyzeButtonLoading]}
           onPress={handleAnalyze}
@@ -329,6 +364,34 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       fontSize: 15,
       fontFamily: 'Inter_600SemiBold',
       color: colors.primaryForeground,
+    },
+    sizeErrorCard: {
+      backgroundColor: '#2A1010',
+      borderRadius: colors.radius,
+      borderWidth: 1,
+      borderColor: colors.loss + '88',
+      padding: 14,
+      flexDirection: 'row',
+      gap: 10,
+      marginBottom: 14,
+      alignItems: 'flex-start',
+    },
+    sizeErrorTitle: {
+      fontSize: 14,
+      fontFamily: 'Inter_600SemiBold',
+      color: colors.loss,
+    },
+    sizeErrorBody: {
+      fontSize: 13,
+      fontFamily: 'Inter_400Regular',
+      color: '#FFAAAA',
+      lineHeight: 18,
+    },
+    sizeErrorHint: {
+      fontSize: 11,
+      fontFamily: 'Inter_400Regular',
+      color: colors.mutedForeground,
+      lineHeight: 16,
     },
     analyzeButton: {
       backgroundColor: colors.accent,
