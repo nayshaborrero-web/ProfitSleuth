@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TAB_BAR_HEIGHT } from './_layout';
 import * as Haptics from 'expo-haptics';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -299,7 +300,7 @@ export default function CalculatorScreen() {
           </Text>
         </TouchableOpacity>
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: TAB_BAR_HEIGHT + insets.bottom + 16 }} />
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TAB_BAR_HEIGHT } from './_layout';
 import * as Haptics from 'expo-haptics';
 import { useColors } from '@/hooks/useColors';
 import { useSettings } from '@/context/SettingsContext';
@@ -149,7 +150,7 @@ export default function SettingsScreen() {
           </Text>
         </TouchableOpacity>
 
-        <View style={{ height: insets.bottom + 20 }} />
+        <View style={{ height: TAB_BAR_HEIGHT + insets.bottom + 16 }} />
       </ScrollView>
     </KeyboardAvoidingView>
   );

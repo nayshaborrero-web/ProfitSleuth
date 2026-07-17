@@ -13,7 +13,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
+import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
+import { TAB_BAR_HEIGHT } from './_layout';
 import * as Haptics from 'expo-haptics';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -100,7 +102,19 @@ export default function ScannerScreen() {
     if (result.canceled || !result.assets[0]) return;
 
     const asset = result.assets[0];
-    const b64 = asset.base64 ?? null;
+
+    // On Android, allowsEditing+base64 is a known Expo bug where the cropper
+    // discards the base64 field. Fall back to reading the URI with FileSystem.
+    let b64 = asset.base64 ?? null;
+    if (!b64 && asset.uri && Platform.OS !== 'web') {
+      try {
+        b64 = await FileSystem.readAsStringAsync(asset.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+      } catch {
+        // FileSystem fallback failed — b64 stays null
+      }
+    }
 
     // Clear previous state
     setResult(null);
@@ -557,7 +571,7 @@ export default function ScannerScreen() {
         </View>
       )}
 
-      <View style={{ height: 100 }} />
+      <View style={{ height: TAB_BAR_HEIGHT + insets.bottom + 16 }} />
     </ScrollView>
   );
 }

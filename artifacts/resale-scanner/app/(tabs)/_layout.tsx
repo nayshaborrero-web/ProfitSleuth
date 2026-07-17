@@ -8,6 +8,9 @@ import { Tabs } from 'expo-router';
 import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 import { SymbolView } from 'expo-symbols';
 import { useColorScheme } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+export const TAB_BAR_HEIGHT = 60;
 
 function NativeTabLayout() {
   return (
@@ -31,9 +34,17 @@ function NativeTabLayout() {
 function ClassicTabLayout() {
   const colors = useColors();
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
   const isDark = colorScheme === 'dark';
   const isIOS = Platform.OS === 'ios';
   const isWeb = Platform.OS === 'web';
+
+  // On Android the tab bar sits at position:absolute, so we must manually
+  // size it to include the system navigation-bar inset at the bottom.
+  const tabBarHeight = isWeb
+    ? 84
+    : TAB_BAR_HEIGHT + insets.bottom;
+  const tabBarPaddingBottom = isWeb ? 34 : insets.bottom;
 
   return (
     <Tabs
@@ -47,8 +58,8 @@ function ClassicTabLayout() {
           borderTopWidth: 1,
           borderTopColor: colors.border,
           elevation: 0,
-          height: isWeb ? 84 : undefined,
-          paddingBottom: isWeb ? 34 : undefined,
+          height: tabBarHeight,
+          paddingBottom: tabBarPaddingBottom,
         },
         tabBarBackground: () =>
           isIOS ? (
@@ -64,7 +75,14 @@ function ClassicTabLayout() {
                 { backgroundColor: colors.tabBarBackground },
               ]}
             />
-          ) : null,
+          ) : (
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: colors.tabBarBackground },
+              ]}
+            />
+          ),
       }}
     >
       <Tabs.Screen
