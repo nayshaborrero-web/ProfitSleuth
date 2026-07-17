@@ -1,6 +1,6 @@
 kind = "mobile"
 previewPath = "/"
-title = "Resale Price Scanner"
+title = "ProfitSleuth"
 version = "1.0.0"
 id = "artifacts/resale-scanner"
 router = "expo-domain"

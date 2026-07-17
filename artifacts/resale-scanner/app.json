@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Resale Price Scanner",
-    "slug": "resale-scanner",
+    "name": "ProfitSleuth",
+    "slug": "profitsleuth",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "resale-scanner",
+    "scheme": "profitsleuth",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -15,11 +15,11 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.resale.scanner",
+      "bundleIdentifier": "com.profitsleuth.app",
       "buildNumber": "1"
     },
     "android": {
-      "package": "com.resale.scanner",
+      "package": "com.profitsleuth.app",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
@@ -46,8 +46,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to analyze items for resale.",
-          "cameraPermission": "The app uses your camera to scan items for resale analysis."
+          "photosPermission": "ProfitSleuth accesses your photos to analyze items for resale.",
+          "cameraPermission": "ProfitSleuth uses your camera to scan items for resale analysis."
         }
       ]
     ],

@@ -1,5 +1,5 @@
 /**
- * Resale Price Scanner — design tokens
+ * ProfitSleuth — design tokens
  * Professional dark theme inspired by Robinhood / Coinbase
  */
 

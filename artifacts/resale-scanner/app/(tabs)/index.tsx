@@ -274,7 +274,7 @@ export default function ScannerScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Resale Scanner</Text>
+        <Text style={styles.title}>ProfitSleuth</Text>
         <Text style={styles.subtitle}>Scan any item to get its market value</Text>
       </View>
 
