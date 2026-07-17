@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: analyze
+    description: AI image analysis operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /analyze:
+    post:
+      operationId: analyzeItemImage
+      tags: [analyze]
+      summary: Analyze item image for resale value
+      description: Accepts a base64-encoded image and returns AI-powered resale analysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeRequest"
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +66,49 @@ components:
           type: string
       required:
         - status
-
+    AnalyzeRequest:
+      type: object
+      properties:
+        imageBase64:
+          type: string
+          description: Base64-encoded image data
+        mimeType:
+          type: string
+          description: MIME type of the image (e.g. image/jpeg)
+      required:
+        - imageBase64
+        - mimeType
+    AnalyzeResult:
+      type: object
+      properties:
+        itemName:
+          type: string
+        category:
+          type: string
+        estimatedLow:
+          type: number
+        estimatedHigh:
+          type: number
+        description:
+          type: string
+        confidenceLevel:
+          type: string
+        suggestedPlatforms:
+          type: array
+          items:
+            type: string
+      required:
+        - itemName
+        - category
+        - estimatedLow
+        - estimatedHigh
+        - description
+        - confidenceLevel
+        - suggestedPlatforms
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

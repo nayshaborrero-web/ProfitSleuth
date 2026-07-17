@@ -1,59 +1,60 @@
 /**
- * Semantic design tokens for the mobile app.
- *
- * These tokens mirror the naming conventions used in web artifacts (index.css)
- * so that multi-artifact projects share a cohesive visual identity.
- *
- * Replace the placeholder values below with values that match the project's
- * brand. If a sibling web artifact exists, read its index.css and convert the
- * HSL values to hex so both artifacts use the same palette.
- *
- * To add dark mode, add a `dark` key with the same token names.
- * The useColors() hook will automatically pick it up.
+ * Resale Price Scanner — design tokens
+ * Professional dark theme inspired by Robinhood / Coinbase
  */
 
 const colors = {
   light: {
-    // Legacy aliases (kept for backward compatibility)
-    text: '#0a0a0a',
-    tint: '#2f95dc',
+    // Legacy aliases
+    text: '#E8F0FE',
+    tint: '#00D4AA',
 
     // Core surfaces
-    background: '#ffffff',
-    foreground: '#0a0a0a',
+    background: '#0A1628',
+    foreground: '#E8F0FE',
 
     // Cards / elevated surfaces
-    card: '#f9f9f9',
-    cardForeground: '#0a0a0a',
+    card: '#142035',
+    cardForeground: '#E8F0FE',
 
-    // Primary action color (buttons, links, active states)
-    primary: '#2f95dc',
-    primaryForeground: '#ffffff',
+    // Primary action color (scan, analyze buttons)
+    primary: '#00D4AA',
+    primaryForeground: '#0A1628',
 
-    // Secondary / less-emphasis interactive surfaces
-    secondary: '#f0f0f0',
-    secondaryForeground: '#1a1a1a',
+    // Secondary
+    secondary: '#1E3A5F',
+    secondaryForeground: '#B0C4DE',
 
-    // Muted / subdued elements (dividers, timestamps, placeholders)
-    muted: '#f0f0f0',
-    mutedForeground: '#737373',
+    // Muted
+    muted: '#1E3A5F',
+    mutedForeground: '#6B8099',
 
-    // Accent highlights (badges, selected items, focus rings)
-    accent: '#f0f0f0',
-    accentForeground: '#1a1a1a',
+    // Accent (price labels, highlights)
+    accent: '#FFB347',
+    accentForeground: '#0A1628',
 
-    // Destructive actions (delete, error states)
-    destructive: '#ef4444',
-    destructiveForeground: '#ffffff',
+    // Profit (green)
+    profit: '#00D4AA',
+    profitForeground: '#0A1628',
+
+    // Loss (red)
+    loss: '#FF5B5B',
+    lossForeground: '#FFFFFF',
+
+    // Destructive
+    destructive: '#FF5B5B',
+    destructiveForeground: '#FFFFFF',
 
     // Borders and input outlines
-    border: '#e5e5e5',
-    input: '#e5e5e5',
+    border: '#1E3A5F',
+    input: '#1E3A5F',
+
+    // Tab bar
+    tabBarBackground: '#0D1F36',
   },
 
-  // Border radius (in px). Sync from the sibling web artifact's --radius
-  // CSS variable. This value applies to cards, buttons, inputs, and modals.
-  radius: 8,
+  radius: 12,
 };
 
 export default colors;
+export type Colors = typeof colors.light;

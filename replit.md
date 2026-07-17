@@ -1,45 +1,73 @@
-# [Project name]
+# Resale Price Scanner
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A mobile-first MVP app that uses AI to analyze item images and calculate resale profit. Scan any item with your camera, get an instant AI-powered market value estimate, and calculate your net profit after platform fees and shipping.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/resale-scanner run dev` — run the Expo mobile app (via workflow)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
+- Mobile: React Native + Expo (SDK 54), Expo Router v6
 - API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
+- AI: Google Gemini 2.5 Flash via Replit AI Integrations (`@workspace/integrations-gemini-ai`)
+- Persistence: AsyncStorage (settings), no database needed
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
-## Where things live
+## Where Things Live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/resale-scanner/` — Expo mobile app
+  - `app/(tabs)/index.tsx` — Scanner screen (camera + gallery + AI analysis)
+  - `app/(tabs)/calculator.tsx` — Profit calculator screen
+  - `app/(tabs)/settings.tsx` — Settings screen (fee %, shipping cost)
+  - `context/SettingsContext.tsx` — AsyncStorage-backed settings (platformFeePercent, shippingCost)
+  - `context/ScanContext.tsx` — Shared state for AI analysis results across screens
+  - `constants/colors.ts` — Dark navy design tokens (primary: #00D4AA teal-green)
+- `artifacts/api-server/src/routes/analyze.ts` — POST /api/analyze route (Gemini Vision)
+- `lib/integrations-gemini-ai/` — Gemini SDK client wrapper
+- `lib/api-spec/openapi.yaml` — OpenAPI spec (source of truth for API contracts)
 
-## Architecture decisions
+## Architecture Decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- **Server-side AI calls**: Gemini API calls happen on the backend (`/api/analyze`) to keep the API key secure and never exposed in the mobile bundle.
+- **AsyncStorage for settings**: Platform fee % and shipping cost are persisted locally — no database needed for user preferences.
+- **Context for scan state**: `ScanContext` shares the last AI analysis between Scanner and Calculator tabs without prop drilling.
+- **Image compression**: `expo-image-picker` compresses to quality 0.7 before base64 encoding to stay under Gemini's 8MB inline data limit.
+- **EAS Build ready**: `app.json` has `bundleIdentifier`, `package`, `versionCode`, and permission strings configured for both iOS and Android store submissions.
 
-## Product
+## Profit Formula
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+```
+Adjusted Sale Price = Market High Estimate × Condition Multiplier
+  - Fair:     70%
+  - Good:     85%
+  - Like New: 95%
 
-## User preferences
+Platform Fee = Adjusted Sale Price × (Fee% / 100)
+Net Profit   = Adjusted Sale Price − Platform Fee − Shipping Cost − Purchase Price
+ROI          = Net Profit / Purchase Price × 100
+```
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+## User Preferences
+
+- Dark navy theme (#0A1628 background, #00D4AA teal-green primary)
+- No emojis in UI — icons only via @expo/vector-icons (Feather)
+- Default platform fee: 15%, default shipping: $5.00
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After any OpenAPI change: run `pnpm --filter @workspace/api-spec run codegen` before using updated hooks.
+- The Gemini integration env vars (`AI_INTEGRATIONS_GEMINI_BASE_URL`, `AI_INTEGRATIONS_GEMINI_API_KEY`) are auto-provisioned — never modify them manually.
+- `@google/genai` must remain a direct dependency of `@workspace/api-server` because esbuild externalizes `@google/*` packages.
 
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See the `expo` skill for mobile development patterns
+- See the `ai-integrations-gemini` skill for Gemini API usage

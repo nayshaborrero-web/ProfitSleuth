@@ -5,16 +5,6 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
-
-export interface AnalyzeRequest {
-  /** Base64-encoded image data */
-  imageBase64: string;
-  /** MIME type of the image (e.g. image/jpeg) */
-  mimeType: string;
-}
 
 export interface AnalyzeResult {
   itemName: string;
@@ -25,8 +15,3 @@ export interface AnalyzeResult {
   confidenceLevel: string;
   suggestedPlatforms: string[];
 }
-
-export interface ErrorResponse {
-  error: string;
-}
-
