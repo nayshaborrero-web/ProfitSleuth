@@ -322,7 +322,7 @@ export default function ScannerScreen() {
       {imageUri && !result && !sizeError && (
         <TouchableOpacity
           style={[styles.analyzeButton, analyzemutation.isPending && styles.analyzeButtonLoading]}
-          onPress={handleAnalyze}
+          onPress={() => handleAnalyze()}
           disabled={analyzemutation.isPending}
           activeOpacity={0.8}
         >
