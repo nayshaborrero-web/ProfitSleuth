@@ -53,10 +53,11 @@ export default function ScannerScreen() {
 
     const options: ImagePicker.ImagePickerOptions = {
       mediaTypes: ['images'],
-      quality: 0.7,
+      quality: 0.4,
       base64: true,
       allowsEditing: true,
       aspect: [4, 3],
+      exif: false,
     };
 
     if (useCamera) {
