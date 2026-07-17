@@ -97,6 +97,11 @@ components:
           type: array
           items:
             type: string
+        listingTags:
+          type: array
+          description: Keyword tags optimised for resale listing titles and tag fields
+          items:
+            type: string
       required:
         - itemName
         - category
@@ -105,6 +110,7 @@ components:
         - description
         - confidenceLevel
         - suggestedPlatforms
+        - listingTags
     ErrorResponse:
       type: object
       properties:

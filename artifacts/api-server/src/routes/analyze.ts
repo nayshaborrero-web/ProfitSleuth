@@ -24,7 +24,8 @@ Return ONLY a valid JSON object with exactly these fields (no markdown, no extra
   "estimatedHigh": <number: optimistic high-end resale price in USD as integer>,
   "description": "2-3 sentences explaining what the item is, its condition (if visible), and why it has this resale value",
   "confidenceLevel": "one of: low, medium, high",
-  "suggestedPlatforms": ["array", "of", "best", "platforms", "to sell on like eBay, Facebook Marketplace, Depop, StockX, etc"]
+  "suggestedPlatforms": ["array", "of", "best", "platforms", "to sell on like eBay, Facebook Marketplace, Depop, StockX, etc"],
+  "listingTags": ["8 to 12 short keyword tags a seller should add to their listing title or tags field, e.g. brand name, model, colour, size, style, condition keywords, niche descriptors — optimised for searchability on resale platforms"]
 }
 
 Be specific and accurate. If the item is not clearly visible, set confidenceLevel to "low" and provide a wide price range.`;

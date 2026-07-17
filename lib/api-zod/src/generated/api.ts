@@ -33,7 +33,8 @@ export const AnalyzeItemImageResponse = zod.object({
   "estimatedHigh": zod.number(),
   "description": zod.string(),
   "confidenceLevel": zod.string(),
-  "suggestedPlatforms": zod.array(zod.string())
+  "suggestedPlatforms": zod.array(zod.string()),
+  "listingTags": zod.array(zod.string()).describe('Keyword tags optimised for resale listing titles and tag fields')
 })
 
 

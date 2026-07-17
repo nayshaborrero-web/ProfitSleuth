@@ -24,6 +24,8 @@ export interface AnalyzeResult {
   description: string;
   confidenceLevel: string;
   suggestedPlatforms: string[];
+  /** Keyword tags optimised for resale listing titles and tag fields */
+  listingTags: string[];
 }
 
 export interface ErrorResponse {

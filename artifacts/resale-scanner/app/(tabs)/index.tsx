@@ -354,6 +354,42 @@ export default function ScannerScreen() {
             </View>
           )}
 
+          {result.listingTags?.length > 0 && (
+            <View style={styles.tagsSection}>
+              <View style={styles.tagsHeader}>
+                <Text style={styles.tagsLabel}>LISTING TAGS</Text>
+                <TouchableOpacity
+                  style={styles.copyTagsButton}
+                  onPress={async () => {
+                    await Clipboard.setStringAsync(result.listingTags.join(', '));
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    Alert.alert('Copied', 'All tags copied to clipboard.');
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Feather name="copy" size={12} color={colors.primary} />
+                  <Text style={styles.copyTagsText}>Copy all</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.tagsRow}>
+                {result.listingTags.map((tag) => (
+                  <TouchableOpacity
+                    key={tag}
+                    style={styles.tagChip}
+                    onPress={async () => {
+                      await Clipboard.setStringAsync(tag);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.tagChipText}>{tag}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Text style={styles.tagsTip}>Tap a tag to copy it individually</Text>
+            </View>
+          )}
+
           <View style={styles.resultActions}>
             <TouchableOpacity
               style={styles.rescanButton}
@@ -458,6 +494,61 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       fontSize: 15,
       fontFamily: 'Inter_600SemiBold',
       color: colors.primaryForeground,
+    },
+    tagsSection: {
+      marginTop: 16,
+      gap: 8,
+    },
+    tagsHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    tagsLabel: {
+      fontSize: 11,
+      fontFamily: 'Inter_600SemiBold',
+      color: colors.mutedForeground,
+      letterSpacing: 0.8,
+    },
+    copyTagsButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      paddingVertical: 3,
+      paddingHorizontal: 8,
+      borderRadius: 6,
+      backgroundColor: colors.primary + '18',
+      borderWidth: 1,
+      borderColor: colors.primary + '44',
+    },
+    copyTagsText: {
+      fontSize: 11,
+      fontFamily: 'Inter_600SemiBold',
+      color: colors.primary,
+    },
+    tagsRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+    },
+    tagChip: {
+      backgroundColor: colors.secondary,
+      borderRadius: 20,
+      paddingVertical: 5,
+      paddingHorizontal: 11,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    tagChipText: {
+      fontSize: 12,
+      fontFamily: 'Inter_500Medium',
+      color: colors.foreground,
+    },
+    tagsTip: {
+      fontSize: 10,
+      fontFamily: 'Inter_400Regular',
+      color: colors.mutedForeground,
+      marginTop: 2,
     },
     pasteButton: {
       flexDirection: 'row',
