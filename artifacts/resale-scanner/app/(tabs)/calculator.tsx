@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TAB_BAR_HEIGHT } from './_layout';
 import * as Haptics from 'expo-haptics';
-import { Feather } from '@expo/vector-icons';
+import { Camera, CheckCircle2, ChevronRight, Settings, Slash, TrendingDown, TrendingUp } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { useColors } from '@/hooks/useColors';
 import { useSettings } from '@/context/SettingsContext';
@@ -105,7 +105,7 @@ export default function CalculatorScreen() {
         {analysis ? (
           <View style={styles.analysisSourceCard}>
             <View style={styles.analysisSourceLeft}>
-              <Feather name="check-circle" size={16} color={colors.profit} />
+              <CheckCircle2 size={16} color={colors.profit} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.analysisSourceTitle} numberOfLines={1}>
                   {analysis.itemName}
@@ -128,12 +128,12 @@ export default function CalculatorScreen() {
             onPress={() => router.push('/(tabs)/')}
             activeOpacity={0.8}
           >
-            <Feather name="camera" size={20} color={colors.primary} />
+            <Camera size={20} color={colors.primary} />
             <View style={{ flex: 1 }}>
               <Text style={styles.scanPromptTitle}>Scan an item first</Text>
               <Text style={styles.scanPromptSub}>Tap to go to the scanner</Text>
             </View>
-            <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+            <ChevronRight size={18} color={colors.mutedForeground} />
           </TouchableOpacity>
         )}
 
@@ -251,7 +251,7 @@ export default function CalculatorScreen() {
         {/* Net Profit Display */}
         {condition === 'free' ? (
           <View style={styles.noResaleCard}>
-            <Feather name="slash" size={28} color={colors.loss} />
+            <Slash size={28} color={colors.loss} />
             <Text style={styles.noResaleTitle}>Not Suitable for Resale</Text>
             <Text style={styles.noResaleBody}>
               This item is in too poor a condition to generate a meaningful return. Consider donating it or disposing of it responsibly.
@@ -260,11 +260,9 @@ export default function CalculatorScreen() {
         ) : (
           <View style={[styles.profitCard, { borderColor: profitColor + '44' }]}>
             <View style={styles.profitHeader}>
-              <Feather
-                name={isProfitable ? 'trending-up' : 'trending-down'}
-                size={20}
-                color={profitColor}
-              />
+              {isProfitable
+                ? <TrendingUp size={20} color={profitColor} />
+                : <TrendingDown size={20} color={profitColor} />}
               <Text style={[styles.profitLabel, { color: profitColor }]}>
                 {isProfitable ? 'NET PROFIT' : 'NET LOSS'}
               </Text>
@@ -294,7 +292,7 @@ export default function CalculatorScreen() {
           onPress={() => router.push('/(tabs)/settings')}
           activeOpacity={0.8}
         >
-          <Feather name="settings" size={14} color={colors.mutedForeground} />
+          <Settings size={14} color={colors.mutedForeground} />
           <Text style={styles.settingsHintText}>
             Fee: {settings.platformFeePercent}% · Shipping: ${settings.shippingCost.toFixed(2)} — Tap to adjust
           </Text>

@@ -17,7 +17,17 @@ import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { TAB_BAR_HEIGHT } from './_layout';
 import * as Haptics from 'expo-haptics';
-import { Feather } from '@expo/vector-icons';
+import {
+  AlertTriangle,
+  Camera,
+  Clipboard as ClipboardIcon,
+  Copy,
+  ImageIcon,
+  Pencil,
+  RefreshCw,
+  TrendingUp,
+  Zap,
+} from 'lucide-react-native';
 import { router } from 'expo-router';
 import { useAnalyzeItemImage } from '@workspace/api-client-react';
 import { useColors } from '@/hooks/useColors';
@@ -279,7 +289,7 @@ export default function ScannerScreen() {
         ) : (
           <View style={styles.placeholderContent}>
             <View style={styles.iconCircle}>
-              <Feather name="camera" size={36} color={colors.primary} />
+              <Camera size={36} color={colors.primary} />
             </View>
             <Text style={styles.placeholderTitle}>Scan an Item</Text>
             <Text style={styles.placeholderSub}>Tap to select a photo or use the buttons below</Text>
@@ -294,7 +304,7 @@ export default function ScannerScreen() {
           onPress={() => pickImage(true)}
           activeOpacity={0.8}
         >
-          <Feather name="camera" size={18} color={colors.primaryForeground} />
+          <Camera size={18} color={colors.primaryForeground} />
           <Text style={styles.actionButtonText}>Camera</Text>
         </TouchableOpacity>
 
@@ -303,7 +313,7 @@ export default function ScannerScreen() {
           onPress={() => pickImage(false)}
           activeOpacity={0.8}
         >
-          <Feather name="image" size={18} color={colors.foreground} />
+          <ImageIcon size={18} color={colors.foreground} />
           <Text style={[styles.actionButtonText, { color: colors.foreground }]}>Gallery</Text>
         </TouchableOpacity>
       </View>
@@ -314,14 +324,14 @@ export default function ScannerScreen() {
         onPress={pasteFromClipboard}
         activeOpacity={0.8}
       >
-        <Feather name="clipboard" size={15} color={colors.mutedForeground} />
+        <ClipboardIcon size={15} color={colors.mutedForeground} />
         <Text style={styles.pasteButtonText}>Paste from Clipboard</Text>
       </TouchableOpacity>
 
       {/* Size Error Disclaimer */}
       {sizeError && (
         <View style={styles.sizeErrorCard}>
-          <Feather name="alert-triangle" size={18} color={styles.sizeErrorTitle.color} />
+          <AlertTriangle size={18} color={styles.sizeErrorTitle.color} />
           <View style={{ flex: 1, gap: 4 }}>
             <Text style={styles.sizeErrorTitle}>Image Too Large</Text>
             <Text style={styles.sizeErrorBody}>{sizeError}</Text>
@@ -347,7 +357,7 @@ export default function ScannerScreen() {
             </View>
           ) : (
             <View style={styles.loadingRow}>
-              <Feather name="zap" size={18} color={colors.primaryForeground} />
+              <Zap size={18} color={colors.primaryForeground} />
               <Text style={styles.analyzeButtonText}>Analyze Item</Text>
             </View>
           )}
@@ -366,7 +376,7 @@ export default function ScannerScreen() {
                   onPress={() => { setNameOverride(result.itemName); setEditingName(true); }}
                   activeOpacity={0.7}
                 >
-                  <Feather name="edit-2" size={13} color={colors.mutedForeground} />
+                  <Pencil size={13} color={colors.mutedForeground} />
                 </TouchableOpacity>
                 <View style={[styles.confidenceBadge, { backgroundColor: confidenceColor + '22', borderColor: confidenceColor }]}>
                   <Text style={[styles.confidenceText, { color: confidenceColor }]}>
@@ -408,7 +418,7 @@ export default function ScannerScreen() {
                     {analyzemutation.isPending ? (
                       <ActivityIndicator size="small" color={colors.primaryForeground} />
                     ) : (
-                      <Feather name="refresh-cw" size={14} color={colors.primaryForeground} />
+                      <RefreshCw size={14} color={colors.primaryForeground} />
                     )}
                     <Text style={styles.reanalyzeButtonText}>
                       {analyzemutation.isPending ? 'Re-analyzing…' : 'Re-analyze'}
@@ -456,7 +466,7 @@ export default function ScannerScreen() {
                   }}
                   activeOpacity={0.7}
                 >
-                  <Feather name="copy" size={12} color={colors.primary} />
+                  <Copy size={12} color={colors.primary} />
                   <Text style={styles.copyTagsText}>Copy all</Text>
                 </TouchableOpacity>
               </View>
@@ -492,7 +502,7 @@ export default function ScannerScreen() {
                   }}
                   activeOpacity={0.7}
                 >
-                  <Feather name="copy" size={12} color={colors.primary} />
+                  <Copy size={12} color={colors.primary} />
                   <Text style={styles.copyTagsText}>Copy full</Text>
                 </TouchableOpacity>
               </View>
@@ -508,7 +518,7 @@ export default function ScannerScreen() {
                     }}
                     activeOpacity={0.7}
                   >
-                    <Feather name="copy" size={13} color={colors.mutedForeground} />
+                    <Copy size={13} color={colors.mutedForeground} />
                   </TouchableOpacity>
                 </View>
                 <TextInput
@@ -533,7 +543,7 @@ export default function ScannerScreen() {
                     }}
                     activeOpacity={0.7}
                   >
-                    <Feather name="copy" size={13} color={colors.mutedForeground} />
+                    <Copy size={13} color={colors.mutedForeground} />
                   </TouchableOpacity>
                 </View>
                 <TextInput
@@ -555,7 +565,7 @@ export default function ScannerScreen() {
               onPress={() => { setResult(null); setImageUri(null); }}
               activeOpacity={0.8}
             >
-              <Feather name="refresh-cw" size={15} color={colors.mutedForeground} />
+              <RefreshCw size={15} color={colors.mutedForeground} />
               <Text style={styles.rescanButtonText}>New Scan</Text>
             </TouchableOpacity>
 
@@ -564,7 +574,7 @@ export default function ScannerScreen() {
               onPress={handleUseForCalculation}
               activeOpacity={0.8}
             >
-              <Feather name="trending-up" size={15} color={colors.primaryForeground} />
+              <TrendingUp size={15} color={colors.primaryForeground} />
               <Text style={styles.calculateButtonText}>Calculate Profit</Text>
             </TouchableOpacity>
           </View>

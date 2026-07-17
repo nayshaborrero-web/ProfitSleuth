@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useColors } from '@/hooks/useColors';
-import { Feather } from '@expo/vector-icons';
+import { Camera, Settings, TrendingUp } from 'lucide-react-native';
 import { Tabs } from 'expo-router';
 import { useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -111,7 +111,7 @@ function ClassicTabLayout() {
             isIOS && SymbolView ? (
               <SymbolView name="camera.viewfinder" tintColor={color} size={24} />
             ) : (
-              <Feather name="camera" size={22} color={color} />
+              <Camera size={22} color={color} />
             ),
         }}
       />
@@ -123,7 +123,7 @@ function ClassicTabLayout() {
             isIOS && SymbolView ? (
               <SymbolView name="chart.line.uptrend.xyaxis" tintColor={color} size={24} />
             ) : (
-              <Feather name="trending-up" size={22} color={color} />
+              <TrendingUp size={22} color={color} />
             ),
         }}
       />
@@ -135,7 +135,7 @@ function ClassicTabLayout() {
             isIOS && SymbolView ? (
               <SymbolView name="gearshape" tintColor={color} size={24} />
             ) : (
-              <Feather name="settings" size={22} color={color} />
+              <Settings size={22} color={color} />
             ),
         }}
       />

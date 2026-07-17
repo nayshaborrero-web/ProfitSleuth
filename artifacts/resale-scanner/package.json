@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "expo-clipboard": "^8.0.8",
-    "expo-file-system": "^19.0.23"
+    "expo-file-system": "^19.0.23",
+    "lucide-react-native": "^1.24.0"
   }
 }

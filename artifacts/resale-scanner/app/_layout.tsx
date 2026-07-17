@@ -38,6 +38,7 @@ export default function RootLayout() {
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+
   });
 
   useEffect(() => {
