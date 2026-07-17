@@ -266,6 +266,22 @@ export default function ScannerScreen() {
       ? colors.accent
       : colors.loss;
 
+  const CONDITION_LABELS: Record<string, string> = {
+    poor: 'Poor',
+    fair: 'Fair',
+    good: 'Good',
+    like_new: 'Like New',
+  };
+
+  const conditionColor =
+    result?.condition === 'like_new'
+      ? colors.profit
+      : result?.condition === 'good'
+      ? colors.accent
+      : result?.condition === 'fair'
+      ? '#F59E0B'
+      : colors.loss;
+
   return (
     <ScrollView
       style={styles.container}
@@ -380,12 +396,21 @@ export default function ScannerScreen() {
                 </TouchableOpacity>
                 <View style={[styles.confidenceBadge, { backgroundColor: confidenceColor + '22', borderColor: confidenceColor }]}>
                   <Text style={[styles.confidenceText, { color: confidenceColor }]}>
-                    {result.confidenceLevel.toUpperCase()}
+                    {result.confidenceLevel.toUpperCase()} CONF.
                   </Text>
                 </View>
               </View>
             </View>
-            <Text style={styles.resultsCategory}>{result.category}</Text>
+            <View style={styles.categoryConditionRow}>
+              <Text style={styles.resultsCategory}>{result.category}</Text>
+              {result.condition && (
+                <View style={[styles.conditionBadge, { backgroundColor: conditionColor + '22', borderColor: conditionColor }]}>
+                  <Text style={[styles.conditionText, { color: conditionColor }]}>
+                    {CONDITION_LABELS[result.condition] ?? result.condition}
+                  </Text>
+                </View>
+              )}
+            </View>
 
             {/* Inline name correction */}
             {editingName && (
@@ -934,10 +959,26 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       paddingVertical: 2,
     },
     confidenceText: { fontSize: 10, fontFamily: 'Inter_600SemiBold', letterSpacing: 0.5 },
+    categoryConditionRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
     resultsCategory: {
       fontSize: 13,
       fontFamily: 'Inter_400Regular',
       color: colors.mutedForeground,
+    },
+    conditionBadge: {
+      borderWidth: 1,
+      borderRadius: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+    },
+    conditionText: {
+      fontSize: 10,
+      fontFamily: 'Inter_600SemiBold',
+      letterSpacing: 0.5,
     },
     priceSection: {
       backgroundColor: colors.secondary,

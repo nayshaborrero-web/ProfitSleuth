@@ -18,6 +18,31 @@ export interface AnalyzeRequest {
   itemNameHint?: string;
 }
 
+/**
+ * Visible condition of the item
+ */
+export type AnalyzeResultCondition = typeof AnalyzeResultCondition[keyof typeof AnalyzeResultCondition];
+
+
+export const AnalyzeResultCondition = {
+  poor: 'poor',
+  fair: 'fair',
+  good: 'good',
+  like_new: 'like_new',
+} as const;
+
+/**
+ * AI confidence in the price estimate
+ */
+export type AnalyzeResultConfidenceLevel = typeof AnalyzeResultConfidenceLevel[keyof typeof AnalyzeResultConfidenceLevel];
+
+
+export const AnalyzeResultConfidenceLevel = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
 export interface ListingTemplate {
   /** Search-optimised listing title (60-80 characters) */
   title: string;
@@ -28,10 +53,13 @@ export interface ListingTemplate {
 export interface AnalyzeResult {
   itemName: string;
   category: string;
+  /** Visible condition of the item */
+  condition: AnalyzeResultCondition;
   estimatedLow: number;
   estimatedHigh: number;
   description: string;
-  confidenceLevel: string;
+  /** AI confidence in the price estimate */
+  confidenceLevel: AnalyzeResultConfidenceLevel;
   suggestedPlatforms: string[];
   /** Keyword tags optimised for resale listing titles and tag fields */
   listingTags: string[];

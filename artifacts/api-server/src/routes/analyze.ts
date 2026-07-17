@@ -25,18 +25,20 @@ Return ONLY a valid JSON object with exactly these fields (no markdown, no extra
 {
   "itemName": "specific descriptive item name",
   "category": "one of: Electronics, Clothing, Footwear, Collectibles, Furniture, Toys, Sports, Books, Jewelry, Other",
+  "condition": "one of exactly: poor, fair, good, like_new — choose based on visible wear. poor = heavily worn/damaged, fair = noticeable wear/flaws, good = light use/minor marks, like_new = barely used/no visible wear. If the item is not clearly visible default to fair.",
   "estimatedLow": <number: conservative low-end resale price in USD as integer>,
   "estimatedHigh": <number: optimistic high-end resale price in USD as integer>,
-  "description": "2-3 sentences explaining what the item is, its condition (if visible), and why it has this resale value",
-  "confidenceLevel": "one of: low, medium, high",
+  "description": "2-3 sentences explaining what the item is, what makes it valuable on the resale market, and why it has this price range. Do NOT describe condition here — condition is captured separately.",
+  "confidenceLevel": "one of: low, medium, high — your confidence in the price estimate accuracy (not the item condition). Use low if the item is unclear or obscured.",
   "suggestedPlatforms": ["array", "of", "best", "platforms", "to sell on like eBay, Facebook Marketplace, Depop, StockX, etc"],
   "listingTags": ["8 to 12 short keyword tags a seller should add to their listing title or tags field, e.g. brand name, model, colour, size, style, condition keywords, niche descriptors — optimised for searchability on resale platforms"],
   "listingTemplate": {
-    "title": "A punchy, search-optimised listing title of 60-80 characters including brand, item name, key feature, and condition",
-    "body": "A ready-to-paste listing description of 3-4 short paragraphs: (1) what the item is and standout features, (2) visible condition details and any flaws to be transparent, (3) what's included in the sale, (4) a brief seller assurance line about dispatch and packaging. Write in second-person seller voice, no markdown, plain text only."
+    "title": "A punchy, search-optimised listing title of 60-80 characters including brand, item name, key feature, and the condition label from the condition field above",
+    "body": "A ready-to-paste listing description of 3-4 short paragraphs: (1) what the item is and standout features, (2) visible condition details consistent with the condition field — be specific and honest about any flaws, (3) what's included in the sale, (4) a brief seller assurance line about dispatch and packaging. Write in second-person seller voice, no markdown, plain text only."
   }
 }
 
+IMPORTANT: The condition field must be exactly one of: poor, fair, good, like_new. No other values are allowed.
 Be specific and accurate. If the item is not clearly visible, set confidenceLevel to "low" and provide a wide price range.`;
 
   try {

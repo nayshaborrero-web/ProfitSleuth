@@ -8,6 +8,8 @@
 
 export * from './analyzeRequest';
 export * from './analyzeResult';
+export * from './analyzeResultCondition';
+export * from './analyzeResultConfidenceLevel';
 export * from './errorResponse';
 export * from './healthStatus';
 export * from './listingTemplate';

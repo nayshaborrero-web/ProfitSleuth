@@ -30,10 +30,11 @@ export const AnalyzeItemImageBody = zod.object({
 export const AnalyzeItemImageResponse = zod.object({
   "itemName": zod.string(),
   "category": zod.string(),
+  "condition": zod.enum(['poor', 'fair', 'good', 'like_new']).describe('Visible condition of the item'),
   "estimatedLow": zod.number(),
   "estimatedHigh": zod.number(),
   "description": zod.string(),
-  "confidenceLevel": zod.string(),
+  "confidenceLevel": zod.enum(['low', 'medium', 'high']).describe('AI confidence in the price estimate'),
   "suggestedPlatforms": zod.array(zod.string()),
   "listingTags": zod.array(zod.string()).describe('Keyword tags optimised for resale listing titles and tag fields'),
   "listingTemplate": zod.object({

@@ -88,6 +88,10 @@ components:
           type: string
         category:
           type: string
+        condition:
+          type: string
+          enum: [poor, fair, good, like_new]
+          description: Visible condition of the item
         estimatedLow:
           type: number
         estimatedHigh:
@@ -96,6 +100,8 @@ components:
           type: string
         confidenceLevel:
           type: string
+          enum: [low, medium, high]
+          description: AI confidence in the price estimate
         suggestedPlatforms:
           type: array
           items:
@@ -110,6 +116,7 @@ components:
       required:
         - itemName
         - category
+        - condition
         - estimatedLow
         - estimatedHigh
         - description
