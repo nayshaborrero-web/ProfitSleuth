@@ -29,7 +29,7 @@ Return ONLY a valid JSON object with exactly these fields (no markdown, no extra
   "estimatedLow": <number: conservative low-end resale price in USD as integer>,
   "estimatedHigh": <number: optimistic high-end resale price in USD as integer>,
   "description": "2-3 sentences explaining what the item is, what makes it valuable on the resale market, and why it has this price range. Do NOT describe condition here — condition is captured separately.",
-  "confidenceLevel": "one of: low, medium, high — your confidence in the price estimate accuracy (not the item condition). Use low if the item is unclear or obscured.",
+  "certainty": <integer 0–100 representing your certainty in the price estimate accuracy — not item condition. Use 0-40 if the item is unclear or obscured, 41-70 for moderate confidence, 71-100 for high confidence>,
   "suggestedPlatforms": ["array", "of", "best", "platforms", "to sell on like eBay, Facebook Marketplace, Depop, StockX, etc"],
   "listingTags": ["8 to 12 short keyword tags a seller should add to their listing title or tags field, e.g. brand name, model, colour, size, style, condition keywords, niche descriptors — optimised for searchability on resale platforms"],
   "listingTemplate": {

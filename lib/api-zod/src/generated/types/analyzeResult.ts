@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AnalyzeResultCondition } from './analyzeResultCondition';
-import type { AnalyzeResultConfidenceLevel } from './analyzeResultConfidenceLevel';
 import type { ListingTemplate } from './listingTemplate';
 
 export interface AnalyzeResult {
@@ -17,8 +16,12 @@ export interface AnalyzeResult {
   estimatedLow: number;
   estimatedHigh: number;
   description: string;
-  /** AI confidence in the price estimate */
-  confidenceLevel: AnalyzeResultConfidenceLevel;
+  /**
+     * AI certainty in the price estimate (0–100%)
+     * @minimum 0
+     * @maximum 100
+     */
+  certainty: number;
   suggestedPlatforms: string[];
   /** Keyword tags optimised for resale listing titles and tag fields */
   listingTags: string[];

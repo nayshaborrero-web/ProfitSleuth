@@ -259,10 +259,11 @@ export default function ScannerScreen() {
 
   const styles = makeStyles(colors, insets);
 
+  const certainty = result?.certainty ?? 0;
   const confidenceColor =
-    result?.confidenceLevel === 'high'
+    certainty >= 71
       ? colors.profit
-      : result?.confidenceLevel === 'medium'
+      : certainty >= 41
       ? colors.accent
       : colors.loss;
 
@@ -396,7 +397,7 @@ export default function ScannerScreen() {
                 </TouchableOpacity>
                 <View style={[styles.confidenceBadge, { backgroundColor: confidenceColor + '22', borderColor: confidenceColor }]}>
                   <Text style={[styles.confidenceText, { color: confidenceColor }]}>
-                    {result.confidenceLevel.toUpperCase()} CONF.
+                    {certainty}% CERTAINTY
                   </Text>
                 </View>
               </View>

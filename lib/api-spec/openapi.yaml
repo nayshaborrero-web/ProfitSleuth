@@ -98,10 +98,11 @@ components:
           type: number
         description:
           type: string
-        confidenceLevel:
-          type: string
-          enum: [low, medium, high]
-          description: AI confidence in the price estimate
+        certainty:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: AI certainty in the price estimate (0–100%)
         suggestedPlatforms:
           type: array
           items:
@@ -120,7 +121,7 @@ components:
         - estimatedLow
         - estimatedHigh
         - description
-        - confidenceLevel
+        - certainty
         - suggestedPlatforms
         - listingTags
         - listingTemplate

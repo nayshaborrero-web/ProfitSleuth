@@ -27,6 +27,11 @@ export const AnalyzeItemImageBody = zod.object({
   "itemNameHint": zod.string().optional().describe('Optional user-supplied item name to override AI identification')
 })
 
+export const analyzeItemImageResponseCertaintyMin = 0;
+export const analyzeItemImageResponseCertaintyMax = 100;
+
+
+
 export const AnalyzeItemImageResponse = zod.object({
   "itemName": zod.string(),
   "category": zod.string(),
@@ -34,7 +39,7 @@ export const AnalyzeItemImageResponse = zod.object({
   "estimatedLow": zod.number(),
   "estimatedHigh": zod.number(),
   "description": zod.string(),
-  "confidenceLevel": zod.enum(['low', 'medium', 'high']).describe('AI confidence in the price estimate'),
+  "certainty": zod.number().min(analyzeItemImageResponseCertaintyMin).max(analyzeItemImageResponseCertaintyMax).describe('AI certainty in the price estimate (0–100%)'),
   "suggestedPlatforms": zod.array(zod.string()),
   "listingTags": zod.array(zod.string()).describe('Keyword tags optimised for resale listing titles and tag fields'),
   "listingTemplate": zod.object({

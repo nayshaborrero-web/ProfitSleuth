@@ -31,18 +31,6 @@ export const AnalyzeResultCondition = {
   like_new: 'like_new',
 } as const;
 
-/**
- * AI confidence in the price estimate
- */
-export type AnalyzeResultConfidenceLevel = typeof AnalyzeResultConfidenceLevel[keyof typeof AnalyzeResultConfidenceLevel];
-
-
-export const AnalyzeResultConfidenceLevel = {
-  low: 'low',
-  medium: 'medium',
-  high: 'high',
-} as const;
-
 export interface ListingTemplate {
   /** Search-optimised listing title (60-80 characters) */
   title: string;
@@ -58,8 +46,12 @@ export interface AnalyzeResult {
   estimatedLow: number;
   estimatedHigh: number;
   description: string;
-  /** AI confidence in the price estimate */
-  confidenceLevel: AnalyzeResultConfidenceLevel;
+  /**
+     * AI certainty in the price estimate (0–100%)
+     * @minimum 0
+     * @maximum 100
+     */
+  certainty: number;
   suggestedPlatforms: string[];
   /** Keyword tags optimised for resale listing titles and tag fields */
   listingTags: string[];
