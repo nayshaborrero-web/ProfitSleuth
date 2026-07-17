@@ -57,6 +57,10 @@ export default function CalculatorScreen() {
   useEffect(() => {
     if (analysis) {
       setItemNameInput(analysis.itemName);
+      const c = analysis.condition as Condition;
+      if (c && c in CONDITION_MULTIPLIERS) {
+        setCondition(c);
+      }
     }
   }, [analysis]);
 
