@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import { Feather } from '@expo/vector-icons';
@@ -110,6 +111,41 @@ export default function ScannerScreen() {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
+  const pasteFromClipboard = async () => {
+    const hasImage = await Clipboard.hasImageAsync();
+    if (!hasImage) {
+      Alert.alert('No Image on Clipboard', 'Copy an image first, then use Paste to scan it.');
+      return;
+    }
+
+    const clipResult = await Clipboard.getImageAsync({ format: 'jpeg' });
+    if (!clipResult?.data) {
+      Alert.alert('Paste Failed', 'Could not read the image from clipboard. Try again.');
+      return;
+    }
+
+    const b64 = clipResult.data;
+
+    setResult(null);
+    setSizeError(null);
+
+    if (b64.length > MAX_BASE64_BYTES) {
+      const sizeMB = (b64.length / 1_000_000).toFixed(1);
+      setSizeError(
+        `This image is too large (${sizeMB} MB encoded). Please use an image under 7.5 MB — try cropping it, lowering your camera resolution, or picking a smaller photo.`
+      );
+      setImageUri(`data:image/jpeg;base64,${b64.slice(0, 200)}`);
+      setImageBase64(null);
+      return;
+    }
+
+    setImageUri(`data:image/jpeg;base64,${b64}`);
+    setImageBase64(b64);
+    setImageMime('image/jpeg');
+
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
   const handleAnalyze = () => {
     if (!imageBase64) return;
     analyzemutation.mutate({
@@ -184,6 +220,16 @@ export default function ScannerScreen() {
           <Text style={[styles.actionButtonText, { color: colors.foreground }]}>Gallery</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Paste from Clipboard */}
+      <TouchableOpacity
+        style={styles.pasteButton}
+        onPress={pasteFromClipboard}
+        activeOpacity={0.8}
+      >
+        <Feather name="clipboard" size={15} color={colors.mutedForeground} />
+        <Text style={styles.pasteButtonText}>Paste from Clipboard</Text>
+      </TouchableOpacity>
 
       {/* Size Error Disclaimer */}
       {sizeError && (
@@ -364,6 +410,23 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       fontSize: 15,
       fontFamily: 'Inter_600SemiBold',
       color: colors.primaryForeground,
+    },
+    pasteButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 7,
+      paddingVertical: 11,
+      borderRadius: colors.radius,
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 14,
+    },
+    pasteButtonText: {
+      fontSize: 13,
+      fontFamily: 'Inter_500Medium',
+      color: colors.mutedForeground,
     },
     sizeErrorCard: {
       backgroundColor: '#2A1010',
