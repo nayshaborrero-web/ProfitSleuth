@@ -23,7 +23,8 @@ export const HealthCheckResponse = zod.object({
  */
 export const AnalyzeItemImageBody = zod.object({
   "imageBase64": zod.string().describe('Base64-encoded image data'),
-  "mimeType": zod.string().describe('MIME type of the image (e.g. image\/jpeg)')
+  "mimeType": zod.string().describe('MIME type of the image (e.g. image\/jpeg)'),
+  "itemNameHint": zod.string().optional().describe('Optional user-supplied item name to override AI identification')
 })
 
 export const AnalyzeItemImageResponse = zod.object({

@@ -11,4 +11,6 @@ export interface AnalyzeRequest {
   imageBase64: string;
   /** MIME type of the image (e.g. image/jpeg) */
   mimeType: string;
+  /** Optional user-supplied item name to override AI identification */
+  itemNameHint?: string;
 }

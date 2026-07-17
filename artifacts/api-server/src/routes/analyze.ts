@@ -4,9 +4,10 @@ import { ai } from "@workspace/integrations-gemini-ai";
 const router = Router();
 
 router.post("/analyze", async (req, res) => {
-  const { imageBase64, mimeType } = req.body as {
+  const { imageBase64, mimeType, itemNameHint } = req.body as {
     imageBase64?: string;
     mimeType?: string;
+    itemNameHint?: string;
   };
 
   if (!imageBase64 || !mimeType) {
@@ -14,7 +15,11 @@ router.post("/analyze", async (req, res) => {
     return;
   }
 
-  const prompt = `You are an expert resale market analyst. Analyze this image of an item and provide a resale value estimate.
+  const hintLine = itemNameHint
+    ? `\n\nIMPORTANT: The user has identified this item as "${itemNameHint}". Use this as the item name and base all pricing, tags, and listing copy on this specific item. Do not override it with your own guess.`
+    : "";
+
+  const prompt = `You are an expert resale market analyst. Analyze this image of an item and provide a resale value estimate.${hintLine}
 
 Return ONLY a valid JSON object with exactly these fields (no markdown, no extra text):
 {

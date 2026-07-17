@@ -39,6 +39,8 @@ export default function ScannerScreen() {
   const [sizeError, setSizeError] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState('');
   const [draftBody, setDraftBody] = useState('');
+  const [editingName, setEditingName] = useState(false);
+  const [nameOverride, setNameOverride] = useState('');
 
   // ~10 MB of base64 ≈ 7.5 MB raw — stays safely under the 20 MB server
   // limit and Gemini's 8 MB inline-data limit.
@@ -56,6 +58,8 @@ export default function ScannerScreen() {
     mutation: {
       onSuccess: (data) => {
         setResult(data as AnalysisResult);
+        setEditingName(false);
+        setNameOverride('');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       },
       onError: () => {
@@ -205,11 +209,21 @@ export default function ScannerScreen() {
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = (hint?: string) => {
     if (!imageBase64) return;
     analyzemutation.mutate({
-      data: { imageBase64, mimeType: imageMime },
+      data: {
+        imageBase64,
+        mimeType: imageMime,
+        ...(hint ? { itemNameHint: hint } : {}),
+      },
     });
+  };
+
+  const handleReanalyze = () => {
+    const hint = nameOverride.trim();
+    if (!hint) return;
+    handleAnalyze(hint);
   };
 
   const handleUseForCalculation = () => {
@@ -331,14 +345,64 @@ export default function ScannerScreen() {
         <View style={styles.resultsCard}>
           <View style={styles.resultsHeader}>
             <View style={styles.resultsTitleRow}>
-              <Text style={styles.resultsItemName}>{result.itemName}</Text>
-              <View style={[styles.confidenceBadge, { backgroundColor: confidenceColor + '22', borderColor: confidenceColor }]}>
-                <Text style={[styles.confidenceText, { color: confidenceColor }]}>
-                  {result.confidenceLevel.toUpperCase()}
-                </Text>
+              <Text style={styles.resultsItemName} numberOfLines={2}>{result.itemName}</Text>
+              <View style={styles.resultsTitleActions}>
+                <TouchableOpacity
+                  style={styles.editNameButton}
+                  onPress={() => { setNameOverride(result.itemName); setEditingName(true); }}
+                  activeOpacity={0.7}
+                >
+                  <Feather name="edit-2" size={13} color={colors.mutedForeground} />
+                </TouchableOpacity>
+                <View style={[styles.confidenceBadge, { backgroundColor: confidenceColor + '22', borderColor: confidenceColor }]}>
+                  <Text style={[styles.confidenceText, { color: confidenceColor }]}>
+                    {result.confidenceLevel.toUpperCase()}
+                  </Text>
+                </View>
               </View>
             </View>
             <Text style={styles.resultsCategory}>{result.category}</Text>
+
+            {/* Inline name correction */}
+            {editingName && (
+              <View style={styles.reanalyzeSection}>
+                <Text style={styles.reanalyzeSectionLabel}>Correct the item name</Text>
+                <TextInput
+                  style={styles.nameOverrideInput}
+                  value={nameOverride}
+                  onChangeText={setNameOverride}
+                  autoFocus
+                  returnKeyType="done"
+                  onSubmitEditing={handleReanalyze}
+                  placeholder="e.g. Nike Air Max 90 White UK9"
+                  placeholderTextColor={colors.mutedForeground}
+                />
+                <View style={styles.reanalyzeActions}>
+                  <TouchableOpacity
+                    style={styles.cancelEditButton}
+                    onPress={() => setEditingName(false)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.cancelEditText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.reanalyzeButton, (!nameOverride.trim() || analyzemutation.isPending) && { opacity: 0.5 }]}
+                    onPress={handleReanalyze}
+                    disabled={!nameOverride.trim() || analyzemutation.isPending}
+                    activeOpacity={0.8}
+                  >
+                    {analyzemutation.isPending ? (
+                      <ActivityIndicator size="small" color={colors.primaryForeground} />
+                    ) : (
+                      <Feather name="refresh-cw" size={14} color={colors.primaryForeground} />
+                    )}
+                    <Text style={styles.reanalyzeButtonText}>
+                      {analyzemutation.isPending ? 'Re-analyzing…' : 'Re-analyze'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
 
           <View style={styles.priceSection}>
@@ -573,6 +637,75 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
     },
     actionButtonText: {
       fontSize: 15,
+      fontFamily: 'Inter_600SemiBold',
+      color: colors.primaryForeground,
+    },
+    resultsTitleActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      flexShrink: 0,
+    },
+    editNameButton: {
+      padding: 6,
+      borderRadius: 6,
+      backgroundColor: colors.secondary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    reanalyzeSection: {
+      marginTop: 12,
+      gap: 8,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    reanalyzeSectionLabel: {
+      fontSize: 11,
+      fontFamily: 'Inter_500Medium',
+      color: colors.mutedForeground,
+    },
+    nameOverrideInput: {
+      backgroundColor: colors.secondary,
+      borderRadius: 8,
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 14,
+      fontFamily: 'Inter_500Medium',
+      color: colors.foreground,
+    },
+    reanalyzeActions: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    cancelEditButton: {
+      flex: 1,
+      paddingVertical: 10,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    cancelEditText: {
+      fontSize: 13,
+      fontFamily: 'Inter_500Medium',
+      color: colors.mutedForeground,
+    },
+    reanalyzeButton: {
+      flex: 2,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      paddingVertical: 10,
+      borderRadius: 8,
+      backgroundColor: colors.primary,
+    },
+    reanalyzeButtonText: {
+      fontSize: 13,
       fontFamily: 'Inter_600SemiBold',
       color: colors.primaryForeground,
     },

@@ -75,6 +75,9 @@ components:
         mimeType:
           type: string
           description: MIME type of the image (e.g. image/jpeg)
+        itemNameHint:
+          type: string
+          description: Optional user-supplied item name to override AI identification
       required:
         - imageBase64
         - mimeType
