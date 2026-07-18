@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -21,6 +22,18 @@ import { ScanProvider } from '@/context/ScanContext';
 setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`);
 
 SplashScreen.preventAutoHideAsync();
+
+// Inject dark-themed scrollbar CSS on web
+if (Platform.OS === 'web') {
+  const style = document.createElement('style');
+  style.textContent = `
+    textarea::-webkit-scrollbar { width: 6px; }
+    textarea::-webkit-scrollbar-track { background: #142035; border-radius: 3px; }
+    textarea::-webkit-scrollbar-thumb { background: #1E3A5F; border-radius: 3px; }
+    textarea::-webkit-scrollbar-thumb:hover { background: #00D4AA; }
+  `;
+  document.head.appendChild(style);
+}
 
 const queryClient = new QueryClient();
 
