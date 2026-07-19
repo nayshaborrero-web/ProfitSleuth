@@ -66,6 +66,7 @@ export default function SettingsScreen() {
           <Text style={styles.subtitle}>Configure your selling preferences</Text>
         </View>
 
+
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>SELLING FEES</Text>
 
@@ -166,15 +167,17 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       paddingBottom: 24,
     },
     title: {
-      fontSize: 28,
+      fontSize: 30,
       fontFamily: 'Inter_700Bold',
+      fontWeight: '800',
       color: colors.foreground,
-      marginBottom: 4,
+      marginBottom: 2,
     },
     subtitle: {
-      fontSize: 14,
+      fontSize: 13,
       fontFamily: 'Inter_400Regular',
-      color: colors.mutedForeground,
+      color: '#8a9aae',
+      letterSpacing: 0.4,
     },
     section: { marginBottom: 24 },
     sectionLabel: {

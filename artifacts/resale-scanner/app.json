@@ -32,13 +32,15 @@
       ]
     },
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon.png",
+      "output": "static",
+      "baseUrl": "/ProfitSleuth"
     },
     "plugins": [
       [
         "expo-router",
         {
-          "origin": "https://replit.com/"
+          "origin": "https://nayshaborrero-web.github.io"
         }
       ],
       "expo-font",
@@ -53,7 +55,8 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": true,
+      "baseUrl": "/ProfitSleuth"
     }
   }
 }
