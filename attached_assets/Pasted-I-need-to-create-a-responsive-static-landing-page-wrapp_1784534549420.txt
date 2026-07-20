@@ -1,0 +1,39 @@
+I need to create a responsive, static landing page wrapper for my Expo React Native web app, perfectly styled to be hosted on GitHub Pages. Please execute the following exact specifications in a single iteration to fix the layout and styling.
+
+CRITICAL AGENT DIRECTIVE: You are restricted to updating ONLY the CSS/styling, the HTML wrapper, and the specific color values requested. Under no circumstances are you to alter, refactor, or delete the underlying React component logic, state management, or button onPress events (Camera, Gallery, Paste, Scanner, Calculator, Settings). Do not prompt me for permission to rewrite components—leave all functionality 100% intact. Execute this in one shot.
+
+1. COLOR PALETTE & TYPOGRAPHY:
+
+Main Page Background: Deep dark navy/black (use #0B1120 or similar).
+
+Accent Color: Bright neon cyan/mint (use #00DDB3 or similar). Use this for all section headers, icons, the "Camera" button inside the app, and the LinkedIn link.
+
+Text Color: Light slate/gray for body text, white for primary numbers/highlights.
+
+2. DESKTOP LAYOUT (3-Column Design):
+
+Center Column: A pure CSS phone mockup (rounded corners, dark inner background #111A28) that houses the live web view of the app.
+
+Left Column: Contains "The Story", "The Bottleneck", and a row of 3 stat boxes (3+ Marketplaces, ~8m Manual, 30s With ProfitSleuth).
+
+Right Column: Contains "The Solution", "The Impact" (with a glowing box for "10x Sourcing Velocity"), and "Tech Stack" pill badges.
+
+Bottom Left Corner: Add a working anchor tag specifically formatted as: <a href="[https://www.linkedin.com/in/naysha-borrero/](https://www.linkedin.com/in/naysha-borrero/)" target="_blank" style="color: #00DDB3; text-decoration: none; font-weight: bold;">Built by Naysha Borrero ↗</a>
+
+3. MOBILE RESPONSIVENESS (Dynamic Layout):
+
+On screens ≤1100px (mobile/tablet), the 3-column grid MUST collapse into a vertical stack.
+
+The informational slides/panels from the Left and Right columns must stack at the TOP of the page.
+
+The center phone mockup containing the app must sit BELOW the top informational panels.
+
+4. FIXING THE WEB VIEW & APP STYLING:
+
+Fix the web view breakdown: Ensure the Expo #root DOM element mounts perfectly inside the center phone mockup container without overflowing, layout shifting, or breaking the CSS wrapper.
+
+Update the app's internal React Native code: Change the internal app header text ("ProfitSleuth") and the "Scanner" active icon to match the new cyan accent color (#00DDB3). Make the app's internal background color match the dark theme.
+
+5. GITHUB PAGES EXPORT:
+
+Ensure the build configuration outputs a clean static directory (like dist or web-build) where index.html holds this exact structure, so I can push it directly to GitHub Pages without needing a Node server.

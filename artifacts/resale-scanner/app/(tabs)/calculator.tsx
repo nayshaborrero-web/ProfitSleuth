@@ -105,7 +105,6 @@ export default function CalculatorScreen() {
           <Text style={styles.subtitle}>Real-time profit breakdown</Text>
         </View>
 
-
         {/* Item Source */}
         {analysis ? (
           <View style={styles.analysisSourceCard}>
@@ -318,19 +317,8 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
       paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 16),
       paddingBottom: 20,
     },
-    title: {
-      fontSize: 30,
-      fontFamily: 'Inter_700Bold',
-      fontWeight: '800',
-      color: colors.foreground,
-      marginBottom: 2,
-    },
-    subtitle: {
-      fontSize: 13,
-      fontFamily: 'Inter_400Regular',
-      color: '#8a9aae',
-      letterSpacing: 0.4,
-    },
+    title: { fontSize: 28, fontFamily: 'Inter_700Bold', color: colors.foreground, marginBottom: 4 },
+    subtitle: { fontSize: 14, fontFamily: 'Inter_400Regular', color: colors.mutedForeground },
     analysisSourceCard: {
       backgroundColor: colors.profit + '18',
       borderRadius: colors.radius,
