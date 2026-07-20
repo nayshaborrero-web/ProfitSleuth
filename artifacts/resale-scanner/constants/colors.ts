@@ -7,19 +7,19 @@ const colors = {
   light: {
     // Legacy aliases
     text: '#E8F0FE',
-    tint: '#00D4AA',
+    tint: '#00DDB3',
 
     // Core surfaces
-    background: '#0A1628',
+    background: '#0B1120',
     foreground: '#E8F0FE',
 
     // Cards / elevated surfaces
-    card: '#142035',
+    card: '#111A28',
     cardForeground: '#E8F0FE',
 
     // Primary action color (scan, analyze buttons)
-    primary: '#00D4AA',
-    primaryForeground: '#0A1628',
+    primary: '#00DDB3',
+    primaryForeground: '#0B1120',
 
     // Secondary
     secondary: '#1E3A5F',

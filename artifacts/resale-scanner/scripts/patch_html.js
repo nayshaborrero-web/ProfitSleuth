@@ -2,11 +2,9 @@
 /**
  * patch_html.js — Non-destructive overlay patcher for ProfitSleuth GitHub Pages deployment.
  *
- * Strategy: never touch the HTML structure.
- *   1. Inject a <style> block into <head> that turns #root into the phone mockup via CSS.
- *   2. Append two position:fixed floating panels + the style block right before </body>.
- *
- * Expo's #root, all script tags, and the entire generated DOM stay 100% untouched.
+ * Strategy: inject CSS + HTML right before </body>. Expo's #root and all script
+ * tags are never touched. CSS shapes #root into the phone mockup on desktop,
+ * and reverts it to full-screen on mobile where the info panels stack above it.
  */
 
 const fs = require('fs');
@@ -16,192 +14,291 @@ const DIST = path.join(__dirname, '..', 'dist');
 
 const INJECT = `
 <style data-patch-dashboard>
+  /* ── Reset & base ── */
   * {
     font-family: system-ui, -apple-system, BlinkMacSystemFont,
                  "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-  }
-
-  body, html {
-    background-color: #030712 !important;
-    margin: 0; padding: 0;
-    width: 100%; height: 100%;
-    overflow: hidden;
-  }
-
-  /* ── Turn #root into the centred phone mockup ── */
-  #root, #main, body > div[data-reactroot] {
-    width: 390px !important;
-    height: 844px !important;
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    /* Add this scale property to help it fit on smaller screens */
-    transform: translate(-50%, -50%) scale(0.85) !important; 
-    transform-origin: center center !important;
-    /* ... keep the rest of your styles ... */
-  }
-
-  /* ── Floating side panels ── */
-  .presentation-panel {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 300px;
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    z-index: 10;
   }
-  .panel-left  { left:  calc(50% - 195px - 332px); }
-  .panel-right { right: calc(50% - 195px - 332px); }
+  body, html {
+    margin: 0; padding: 0;
+    background-color: #0B1120 !important;
+  }
 
-  .brand-name    { color: #00D4AA; font-size: 17px; font-weight: 800; margin: 0 0 3px; letter-spacing: 0.3px; }
-  .brand-tagline { color: #4A6A8A; font-size: 10px; margin: 0; letter-spacing: 0.5px; }
-  .brand-mark    { border-bottom: 1px solid #1E3A5F; padding-bottom: 14px; }
+  /* ──────────────────────────────────────────
+     DESKTOP  (> 1100 px)
+     #root becomes the centred phone mockup.
+     Side panels float fixed on each side.
+  ────────────────────────────────────────── */
+  @media (min-width: 1101px) {
+    html, body { width: 100%; height: 100%; overflow: hidden; }
 
-  .p-section { display: flex; flex-direction: column; gap: 7px; }
-  .p-label   { display: flex; align-items: center; gap: 7px; }
-  .p-accent  { width: 3px; height: 13px; border-radius: 2px; background: #00D4AA; flex-shrink: 0; }
-  .p-title   { color: #22d3ee; font-size: 10px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; margin: 0; }
-  .p-body    { color: #94a3b8; font-size: 13px; line-height: 1.65; margin: 0; }
+    /* Phone mockup */
+    #root, #main, body > div[data-reactroot] {
+      width: 390px !important;
+      height: 844px !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      background-color: #111A28 !important;
+      border-radius: 40px !important;
+      border: 6px solid #1e293b !important;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.75),
+                  0 0 0 1px rgba(0,221,179,0.07) !important;
+      overflow: hidden !important;
+      z-index: 5 !important;
+    }
 
-  .stat-row { display: flex; gap: 8px; }
-  .stat {
+    /* Floating panels */
+    .pf-panel {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      z-index: 10;
+    }
+    .pf-left  { left:  calc(50% - 195px - 330px); }
+    .pf-right { right: calc(50% - 195px - 330px); }
+
+    /* Mobile panels hidden on desktop */
+    .pm-panels { display: none !important; }
+  }
+
+  /* ──────────────────────────────────────────
+     MOBILE / TABLET  (≤ 1100 px)
+     Panels stack at top; app fills screen below.
+  ────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    html, body { width: 100%; height: auto; overflow-y: auto; }
+
+    /* Desktop floating panels hidden */
+    .pf-panel { display: none !important; }
+
+    /* Stacked mobile panels */
+    .pm-panels {
+      display: flex !important;
+      flex-direction: column;
+      gap: 0;
+      width: 100%;
+      background: #0B1120;
+      padding: 28px 20px 20px;
+    }
+    .pm-row {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .pm-col {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    /* App fills full screen below the panels */
+    #root, #main, body > div[data-reactroot] {
+      position: relative !important;
+      top: auto !important; left: auto !important;
+      transform: none !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background-color: #0B1120 !important;
+      overflow: hidden !important;
+      z-index: 5 !important;
+    }
+  }
+
+  /* ── Shared panel typography & components ── */
+  .pf-brand-mark, .pm-brand-mark {
+    border-bottom: 1px solid #1E3A5F;
+    padding-bottom: 12px;
+    margin-bottom: 4px;
+  }
+  .pf-brand-name, .pm-brand-name {
+    color: #00DDB3; font-size: 17px; font-weight: 800;
+    letter-spacing: 0.3px; margin: 0 0 3px;
+  }
+  .pf-brand-tag, .pm-brand-tag {
+    color: #4A6A8A; font-size: 10px; margin: 0; letter-spacing: 0.5px;
+  }
+
+  .pf-section, .pm-section { display: flex; flex-direction: column; gap: 7px; }
+  .pf-lbl, .pm-lbl { display: flex; align-items: center; gap: 7px; }
+  .pf-accent, .pm-accent {
+    width: 3px; height: 12px; border-radius: 2px;
+    background: #00DDB3; flex-shrink: 0;
+  }
+  .pf-title, .pm-title {
+    color: #00DDB3; font-size: 10px; font-weight: 800;
+    letter-spacing: 1.4px; text-transform: uppercase; margin: 0;
+  }
+  .pf-body, .pm-body {
+    color: #94a3b8; font-size: 13px; line-height: 1.65; margin: 0;
+  }
+
+  .pf-stat-row, .pm-stat-row { display: flex; gap: 7px; }
+  .pf-stat, .pm-stat {
     flex: 1; background: #0D1F36; border-radius: 10px;
     border: 1px solid #1E3A5F; padding: 10px;
     display: flex; flex-direction: column; align-items: center; gap: 3px;
   }
-  .stat-v { color: #E8F0FE; font-size: 17px; font-weight: 800; margin: 0; }
-  .stat-l { color: #4A6A8A; font-size: 9px; font-weight: 500; text-align: center; letter-spacing: 0.4px; margin: 0; }
-
-  .impact-badge {
-    background: rgba(0,212,170,0.08); border-radius: 12px;
-    border: 1px solid rgba(0,212,170,0.27); padding: 14px;
-    display: flex; flex-direction: column; align-items: center;
+  .pf-sv, .pm-sv { color: #E8F0FE; font-size: 16px; font-weight: 800; margin: 0; }
+  .pf-sl, .pm-sl {
+    color: #4A6A8A; font-size: 9px; font-weight: 500;
+    text-align: center; letter-spacing: 0.3px; margin: 0;
   }
-  .impact-big { color: #00D4AA; font-size: 36px; font-weight: 800; line-height: 1; margin: 0 0 3px; }
-  .impact-sub { color: #00D4AA; font-size: 11px; font-weight: 500; letter-spacing: 0.6px; margin: 0; }
 
-  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip {
+  .pf-impact, .pm-impact {
+    background: rgba(0,221,179,0.08);
+    border-radius: 12px; border: 1px solid rgba(0,221,179,0.27);
+    padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .pf-ibig, .pm-ibig {
+    color: #00DDB3; font-size: 34px; font-weight: 800; line-height: 1; margin: 0 0 3px;
+  }
+  .pf-isub, .pm-isub {
+    color: #00DDB3; font-size: 11px; font-weight: 500; letter-spacing: 0.6px; margin: 0;
+  }
+
+  .pf-chips, .pm-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pf-chip, .pm-chip {
     background: #0D1F36; border-radius: 20px; border: 1px solid #1E3A5F;
     padding: 4px 10px; color: #6B8099; font-size: 11px; font-weight: 500;
   }
-  .chip:hover { background: #1E3A5F; }
 
-  .creator-link {
-    color: #00D4AA !important;
+  /* ── LinkedIn attribution — bottom-left, always visible ── */
+  .pf-attribution {
+    position: fixed;
+    bottom: 16px;
+    left: 20px;
+    z-index: 20;
+    font-size: 12px;
+  }
+  .pf-attribution a {
+    color: #00DDB3 !important;
     text-decoration: none !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    margin-top: 15px;
-    display: inline-block;
-    transition: color 0.2s ease;
+    font-weight: bold !important;
   }
-  .creator-link:hover {
-    color: #22d3ee !important;
-    text-decoration: underline !important;
-  }
-
-/* ── Responsive: Stack panels then app on mobile ── */
-  @media (max-width: 1100px), (max-height: 800px) {
-    /* Unlock scrolling completely for BOTH root elements */
-    html, body {
-      overflow: auto !important;
-      overflow-y: auto !important;
-      height: auto !important;
-    }
-
-    /* Make the body a scrolling column layout */
-    body {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      padding: 30px 15px !important;
-    }
-
-    /* Force panels to show up top statically */
-    .presentation-panel {
-      position: static !important;
-      transform: none !important;
-      width: 100% !important;
-      max-width: 390px !important;
-      display: flex !important;
-      order: 1 !important; /* This keeps the slides first */
-      margin-bottom: 30px !important;
-    }
-
-    /* Force the phone app to drop directly below the panels */
-    #root, #main, body > div[data-reactroot] {
-      position: relative !important;
-      left: auto !important;
-      top: auto !important;
-      transform: none !important;
-      order: 2 !important; /* This forces the app to be at the bottom */
-      margin-bottom: 60px !important;
-    }
-  }
-  
+  .pf-attribution a:hover { text-decoration: underline !important; }
 </style>
 
-<!-- LEFT floating panel — sits outside Expo's DOM entirely -->
-<div class="presentation-panel panel-left">
-  <div class="brand-mark">
-    <p class="brand-name">ProfitSleuth</p>
-    <p class="brand-tagline">Resale Intelligence &middot; Powered by Gemini</p>
+<!-- ════════════════════════════════════════
+     DESKTOP: fixed floating panels (hidden on mobile via CSS)
+════════════════════════════════════════ -->
+<div class="pf-panel pf-left">
+  <div class="pf-brand-mark">
+    <p class="pf-brand-name">ProfitSleuth</p>
+    <p class="pf-brand-tag">Resale Intelligence &middot; Powered by Gemini</p>
   </div>
-
-  <div class="p-section">
-    <div class="p-label"><div class="p-accent"></div><p class="p-title">The Story</p></div>
-    <p class="p-body">I live near liquidation and return stores. Sourcing was a massive headache&mdash;standing in aisles manually typing titles into different browsers while trying to guess shipping fees and calculate platform cuts. It felt like data entry, not a hustle.</p>
+  <div class="pf-section">
+    <div class="pf-lbl"><div class="pf-accent"></div><p class="pf-title">The Story</p></div>
+    <p class="pf-body">I live near liquidation and return stores. Sourcing was a massive headache&mdash;standing in aisles manually typing titles into different browsers, guessing shipping fees, and calculating platform cuts. It felt like data entry instead of a hustle.</p>
   </div>
-
-  <div class="p-section">
-    <div class="p-label"><div class="p-accent"></div><p class="p-title">The Bottleneck</p></div>
-    <p class="p-body">Manual lookups slow buying speed to a crawl, causing missed high-profit items in store bins.</p>
+  <div class="pf-section">
+    <div class="pf-lbl"><div class="pf-accent"></div><p class="pf-title">The Bottleneck</p></div>
+    <p class="pf-body">Manual lookups slow buying speed to a crawl, causing missed high-profit items in store bins.</p>
   </div>
-
-  <div class="stat-row">
-    <div class="stat"><p class="stat-v">3+</p><p class="stat-l">Marketplaces checked</p></div>
-    <div class="stat"><p class="stat-v">~8m</p><p class="stat-l">Manual lookup</p></div>
-    <div class="stat"><p class="stat-v">30s</p><p class="stat-l">With ProfitSleuth</p></div>
-  </div>
-
-  <!-- Naysha's LinkedIn Link safely nested inside -->
-  <div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #1E3A5F;">
-    <a class="creator-link" href="https://www.linkedin.com/in/naysha-borrero/" target="_blank" rel="noopener noreferrer">
-      Built by Naysha Borrero ↗
-    </a>
+  <div class="pf-stat-row">
+    <div class="pf-stat"><p class="pf-sv">3+</p><p class="pf-sl">Marketplaces checked</p></div>
+    <div class="pf-stat"><p class="pf-sv">~8m</p><p class="pf-sl">Manual lookup</p></div>
+    <div class="pf-stat"><p class="pf-sv">30s</p><p class="pf-sl">With ProfitSleuth</p></div>
   </div>
 </div>
 
-<!-- RIGHT floating panel — sits outside Expo's DOM entirely -->
-<div class="presentation-panel panel-right">
-  <div class="p-section">
-    <div class="p-label"><div class="p-accent"></div><p class="p-title">The Solution</p></div>
-    <p class="p-body">A clean 30-second workflow. Snapshot an item to instantly fetch real market values, calculate dynamic net margins (fees&thinsp;/&thinsp;shipping), and auto-generate AI product listings and SEO tags.</p>
+<div class="pf-panel pf-right">
+  <div class="pf-section">
+    <div class="pf-lbl"><div class="pf-accent"></div><p class="pf-title">The Solution</p></div>
+    <p class="pf-body">A clean 30-second workflow. Snapshot an item to instantly fetch real market values, calculate dynamic net margins (fees&thinsp;/&thinsp;shipping), and auto-generate AI product listings and SEO tags.</p>
   </div>
-
-  <div class="p-section">
-    <div class="p-label"><div class="p-accent"></div><p class="p-title">The Impact</p></div>
-    <div class="impact-badge">
-      <p class="impact-big">10&times;</p>
-      <p class="impact-sub">Sourcing Velocity</p>
+  <div class="pf-section">
+    <div class="pf-lbl"><div class="pf-accent"></div><p class="pf-title">The Impact</p></div>
+    <div class="pf-impact">
+      <p class="pf-ibig">10&times;</p>
+      <p class="pf-isub">Sourcing Velocity</p>
     </div>
-    <p class="p-body">From blind guesswork to data-backed acquisition decisions on the spot&mdash;lowering the barrier to building a reselling side income.</p>
+    <p class="pf-body">From blind guesswork to data-backed acquisition decisions on the spot&mdash;lowering the barrier to building a reselling side income.</p>
   </div>
-
-  <div class="p-section">
-    <div class="p-label"><div class="p-accent"></div><p class="p-title">Tech Stack</p></div>
-    <div class="chip-row">
-      <span class="chip">Gemini Vision</span>
-      <span class="chip">Expo Router</span>
-      <span class="chip">React Native</span>
-      <span class="chip">GitHub Pages</span>
-      <span class="chip">Node API</span>
+  <div class="pf-section">
+    <div class="pf-lbl"><div class="pf-accent"></div><p class="pf-title">Tech Stack</p></div>
+    <div class="pf-chips">
+      <span class="pf-chip">Gemini Vision</span>
+      <span class="pf-chip">Expo Router</span>
+      <span class="pf-chip">React Native</span>
+      <span class="pf-chip">GitHub Pages</span>
+      <span class="pf-chip">Node API</span>
     </div>
   </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MOBILE: stacked panels above the app (hidden on desktop via CSS)
+════════════════════════════════════════ -->
+<div class="pm-panels">
+  <div class="pm-brand-mark" style="margin-bottom:20px;">
+    <p class="pm-brand-name">ProfitSleuth</p>
+    <p class="pm-brand-tag">Resale Intelligence &middot; Powered by Gemini</p>
+  </div>
+  <div class="pm-row">
+    <div class="pm-col">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="pm-section">
+          <div class="pm-lbl"><div class="pm-accent"></div><p class="pm-title">The Story</p></div>
+          <p class="pm-body">Standing in liquidation aisles manually typing titles into different browsers, guessing fees, calculating cuts. It felt like data entry instead of a hustle.</p>
+        </div>
+        <div class="pm-section">
+          <div class="pm-lbl"><div class="pm-accent"></div><p class="pm-title">The Bottleneck</p></div>
+          <p class="pm-body">Manual lookups slow buying speed, causing missed high-profit items in store bins.</p>
+        </div>
+        <div class="pm-stat-row">
+          <div class="pm-stat"><p class="pm-sv">3+</p><p class="pm-sl">Marketplaces</p></div>
+          <div class="pm-stat"><p class="pm-sv">~8m</p><p class="pm-sl">Manual lookup</p></div>
+          <div class="pm-stat"><p class="pm-sv">30s</p><p class="pm-sl">ProfitSleuth</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="pm-col">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="pm-section">
+          <div class="pm-lbl"><div class="pm-accent"></div><p class="pm-title">The Solution</p></div>
+          <p class="pm-body">Snapshot an item to instantly fetch real market values, calculate net margins, and auto-generate AI listings and SEO tags.</p>
+        </div>
+        <div class="pm-section">
+          <div class="pm-lbl"><div class="pm-accent"></div><p class="pm-title">The Impact</p></div>
+          <div class="pm-impact">
+            <p class="pm-ibig">10&times;</p>
+            <p class="pm-isub">Sourcing Velocity</p>
+          </div>
+        </div>
+        <div class="pm-section">
+          <div class="pm-lbl"><div class="pm-accent"></div><p class="pm-title">Tech Stack</p></div>
+          <div class="pm-chips">
+            <span class="pm-chip">Gemini Vision</span>
+            <span class="pm-chip">Expo Router</span>
+            <span class="pm-chip">React Native</span>
+            <span class="pm-chip">GitHub Pages</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="color:#4A6A8A;font-size:11px;margin:20px 0 0;text-align:center;letter-spacing:0.4px;">
+    ↓ Live app below &mdash; scroll down to use it
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════
+     LinkedIn attribution — bottom-left corner
+════════════════════════════════════════ -->
+<div class="pf-attribution">
+  <a href="https://www.linkedin.com/in/naysha-borrero/" target="_blank" rel="noopener noreferrer">
+    Built by Naysha Borrero ↗
+  </a>
 </div>
 `;
 
@@ -219,7 +316,7 @@ function patchFile(filepath) {
     return;
   }
 
-  // Single safe injection point: right before </body>
+  // Single safe injection point: right before </body>.
   // Expo's entire DOM — #root, script tags, everything — stays completely untouched.
   html = html.replace('</body>', `${INJECT}\n</body>`);
 

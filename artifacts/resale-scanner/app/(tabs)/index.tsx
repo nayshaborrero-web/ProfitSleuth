@@ -11,30 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
-/** Gradient text: CSS gradient on web, primary teal on native. */
-function GradientText({ children, style }: { children: React.ReactNode; style?: object }) {
-  if (Platform.OS === 'web') {
-    return (
-      <Text
-        style={[
-          style,
-          {
-            // @ts-ignore — web-only CSS
-            backgroundImage: 'linear-gradient(90deg, #00D4AA 0%, #818CF8 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            color: 'transparent',
-          } as any,
-        ]}
-      >
-        {children}
-      </Text>
-    );
-  }
-  return <Text style={style}>{children}</Text>;
-}
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
 import * as FileSystem from 'expo-file-system';
@@ -315,10 +291,7 @@ export default function ScannerScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.aiBadge}>
-          <Text style={styles.aiBadgeText}>✨ GEMINI VISION · AI-POWERED</Text>
-        </View>
-        <GradientText style={styles.title}>ProfitSleuth</GradientText>
+        <Text style={styles.title}>ProfitSleuth</Text>
         <Text style={styles.subtitle}>Scan any item to get its market value</Text>
       </View>
 
@@ -646,36 +619,17 @@ function makeStyles(colors: ReturnType<typeof useColors>, insets: ReturnType<typ
     header: {
       paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 16),
       paddingBottom: 20,
-      gap: 6,
-    },
-    aiBadge: {
-      alignSelf: 'flex-start',
-      borderWidth: 1,
-      borderColor: '#00D4AA66',
-      borderRadius: 20,
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      backgroundColor: '#00D4AA10',
-      marginBottom: 4,
-    },
-    aiBadgeText: {
-      fontSize: 10,
-      fontFamily: 'Inter_600SemiBold',
-      color: '#00D4AA',
-      letterSpacing: 0.8,
     },
     title: {
-      fontSize: 32,
+      fontSize: 28,
       fontFamily: 'Inter_700Bold',
-      fontWeight: '800',
-      color: colors.foreground,
-      marginBottom: 2,
+      color: colors.primary,
+      marginBottom: 4,
     },
     subtitle: {
-      fontSize: 13,
+      fontSize: 14,
       fontFamily: 'Inter_400Regular',
-      color: '#8a9aae',
-      letterSpacing: 0.4,
+      color: colors.mutedForeground,
     },
     imageArea: {
       height: 240,
