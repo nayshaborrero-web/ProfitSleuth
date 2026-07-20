@@ -1,0 +1,41 @@
+Task Goal: Build and force-deploy the fully functional, responsive ProfitSleuth web app to the gh-pages branch on GitHub with exact visual, functional, and routing fidelity.
+
+Strict Rules & Visual Specifications:
+
+Preserve Interactive React App: Do NOT overwrite or replace dist/index.html with static text, README content, or plain markdown. The core interactive React Native / Expo Router application must mount and function inside the phone frame container.
+
+LinkedIn Attribution Link: Ensure the bottom-left footer link ("Built by Naysha Borrero") directly references [https://www.linkedin.com/in/naysha-borrero/](https://www.linkedin.com/in/naysha-borrero/) and opens in a new tab (target="_blank" rel="noopener noreferrer").
+
+Desktop & Mobile Layout Fidelity:
+
+Desktop Screen (>1100px): The main application must render inside a centered 390x844 phone mockup container with a #111A28 dark navy background, rounded borders, and subtle glow shadow. The informational side panels ("THE STORY", "THE BOTTLENECK", "THE SOLUTION", "THE IMPACT", "TECH STACK") must float fixed on the left and right sides of the central phone frame.
+
+Mobile/Tablet Screen (≤1100px): The layout must scale responsively so the phone container and app UI adapt cleanly without overflowing or hiding interactive elements.
+
+Fix Path Routing (app.json):
+
+Open resale-scanner/app.json. Ensure "baseUrl": "/ProfitSleuth" is set under the "web" configuration block.
+
+Delete any "baseUrl" key located under the "experiments" block in app.json to prevent JavaScript chunk 404 path errors.
+
+Build Execution:
+
+Step into resale-scanner (or artifacts/resale-scanner).
+
+Execute npm run build:web (or npx expo export --platform web).
+
+If running any HTML patch script (e.g., fix-base-path.js or patch_html.js), run it strictly to inject CSS container wrappers, asset paths, and the LinkedIn link. Do NOT strip out root React DOM nodes or replace HTML content with plain text.
+
+Direct Git Force-Push (Avoid E2BIG Error):
+
+Do NOT run npx gh-pages or use the gh-pages npm package (it causes process spawn E2BIG errors).
+
+Step inside the output build folder (cd dist).
+
+Run the following terminal sequence:
+git init
+git checkout -b gh-pages
+git add .
+git commit -m "Deploy functional responsive app with updated LinkedIn link"
+git remote add origin [https://github.com/nayshaborrero-web/ProfitSleuth.git](https://github.com/nayshaborrero-web/ProfitSleuth.git)
+git push -f origin gh-pages
